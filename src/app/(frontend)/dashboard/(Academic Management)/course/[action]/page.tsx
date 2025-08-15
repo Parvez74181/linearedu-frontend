@@ -10,16 +10,16 @@ const page = async ({ searchParams, params }: Props) => {
   if (action === "create") {
     return (
       <>
-        <CreateOrUpdateView fromPage="Class" action="Create" role={"admin"} />
+        <CreateOrUpdateView fromPage="Course" action="Create" role={"admin"} />
       </>
     );
   } else if (action === "update") {
     const { id } = await searchParams;
-    const res = await fetch(`${process.env.API_V1}/class?id=${id}`).then((res) => res.json());
+    const res = await fetch(`${process.env.API_V1}/course?id=${id}`).then((res) => res.json());
 
     return (
       <>
-        <CreateOrUpdateView fromPage="Class" action="Update" role={"admin"} data={res.data} />
+        <CreateOrUpdateView fromPage="Course" action="Update" role={"admin"} data={res.data} />
       </>
     );
   } else {

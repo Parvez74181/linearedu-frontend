@@ -1,4 +1,4 @@
-import CreateOrUpdateView from "@/components/AcademicManagement/CreateOrUpdateView";
+import CreateOrUpdateView from "@/components/Highlights/CreateOrUpdateView";
 
 interface Props {
   params: Promise<{ action: string }>;
@@ -10,16 +10,16 @@ const page = async ({ searchParams, params }: Props) => {
   if (action === "create") {
     return (
       <>
-        <CreateOrUpdateView fromPage="Class" action="Create" role={"admin"} />
+        <CreateOrUpdateView fromPage="Banner" action="Create" role={"admin"} />
       </>
     );
   } else if (action === "update") {
     const { id } = await searchParams;
-    const res = await fetch(`${process.env.API_V1}/class?id=${id}`).then((res) => res.json());
+    const res = await fetch(`${process.env.API_V1}/banner?id=${id}`).then((res) => res.json());
 
     return (
       <>
-        <CreateOrUpdateView fromPage="Class" action="Update" role={"admin"} data={res.data} />
+        <CreateOrUpdateView fromPage="Banner" action="Update" role={"admin"} data={res.data} />
       </>
     );
   } else {

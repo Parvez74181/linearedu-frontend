@@ -1,18 +1,5 @@
 "use client";
-import {
-  BreadcrumbItem,
-  Breadcrumbs,
-  Button,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Pagination,
-  Tooltip,
-  useDisclosure,
-} from "@heroui/react";
+import { BreadcrumbItem, Breadcrumbs, Button, Input, Pagination, Tooltip } from "@heroui/react";
 import { Table, TableHeader, TableBody, TableColumn, TableRow, TableCell } from "@heroui/table";
 import { Edit, Eye, Plus, SearchIcon, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -20,9 +7,23 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AlertModal } from "@/components/alert-modal";
 import showToast from "@/lib/toast";
-import { deleteAcademicStructure } from "@/actions";
-import { format } from "date-fns";
 
+import { formatTimeTo12Hour } from "@/lib/utils";
+
+import { format } from "date-fns";
+import { deleteInstances } from "@/actions";
+
+type Data = {
+  id: number;
+  classId?: number;
+  groupId?: number;
+  class?: any;
+  group?: any;
+  name: string;
+  shortForm?: string;
+  startTime?: string;
+  endTime?: string;
+};
 type Props = {
   fromPage: string;
   data: any[];
@@ -36,19 +37,14 @@ const MainView = ({ fromPage, data, totalPage, totalRow, role }: Props) => {
   const columns = [
     { key: "#", label: "#" },
     { key: "id", label: "ID" },
-    { key: "classId", label: "CLASS" },
-    { key: "subjectId", label: "SUBJECT" },
-    { key: "chapterId", label: "CHAPTER" },
-    { key: "topicId", label: "TOPIC" },
-    { key: "question", label: "QUESTION" },
+    { key: "name", label: `${fromPage.toUpperCase()} NAME` },
     { key: "createdAt", label: "CREATED AT" },
     { key: "updatedAt", label: "UPDATED AT" },
     { key: "actions", label: "ACTIONS" },
   ];
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [mainViewData, setMainViewData] = useState<any[]>([]);
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [mainViewData, setMainViewData] = useState<Data[]>([]);
 
   useEffect(() => {
     if (data) setMainViewData(data);
@@ -83,7 +79,7 @@ const MainView = ({ fromPage, data, totalPage, totalRow, role }: Props) => {
       title: "Confirm Action",
       message: "Are you sure you want to delete this data?",
       onConfirm: async () => {
-        const resDelete = await deleteAcademicStructure(id, fromPage);
+        const resDelete = await deleteInstances(id, fromPage);
 
         if (resDelete.success) {
           showToast("Success", "success", resDelete.message);
@@ -104,21 +100,13 @@ const MainView = ({ fromPage, data, totalPage, totalRow, role }: Props) => {
         return (
           <TableCell className="flex items-center gap-3">
             <Tooltip content={`Edit ${fromPage}`} color="foreground">
-              <Link
-                href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/update?id=${item.id}&type=${
-                  item.questionType
-                }`}
-              >
+              <Link href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/update?id=${item.id}`}>
                 <Edit strokeWidth={1.5} />
               </Link>
             </Tooltip>
 
             <Tooltip content={`View ${fromPage}`} color="foreground">
-              <Link
-                href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/update?id=${item.id}&type=${
-                  item.questionType
-                }`}
-              >
+              <Link href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/update?id=${item.id}`}>
                 <Eye strokeWidth={1.5} />
               </Link>
             </Tooltip>
@@ -131,23 +119,17 @@ const MainView = ({ fromPage, data, totalPage, totalRow, role }: Props) => {
           </TableCell>
         );
       case "classId":
-        return <TableCell>{item?.topic?.chapter?.subject?.class?.name || "-"}</TableCell>;
+        return (
+          <TableCell>
+            {item?.class?.name || item?.subject?.class?.name || item?.chapter?.subject?.class?.name || "-"}
+          </TableCell>
+        );
       case "subjectId":
-        return <TableCell>{item?.topic?.chapter?.subject?.name || "-"}</TableCell>;
+        return <TableCell>{item?.subject?.name || item?.chapter?.subject?.name || "-"}</TableCell>;
       case "chapterId":
-        return <TableCell>{item?.topic?.chapter?.name || "-"}</TableCell>;
-      case "topicId":
-        return (
-          <TableCell>
-            {(item?.topic?.name?.length > 30 ? item?.topic?.name?.substring(0, 30) + "..." : item?.topic?.name) || "-"}
-          </TableCell>
-        );
-      case "question":
-        return (
-          <TableCell>
-            {(item?.question?.length > 30 ? item?.question?.substring(0, 30) + "..." : item?.question) || "-"}
-          </TableCell>
-        );
+        return <TableCell>{item?.chapter?.name || "-"}</TableCell>;
+      case "groupId":
+        return <TableCell>{item?.group?.name || "-"}</TableCell>;
       case "#":
         return <TableCell>{data.indexOf(item) + 1}</TableCell>;
       case "createdAt":
@@ -165,11 +147,13 @@ const MainView = ({ fromPage, data, totalPage, totalRow, role }: Props) => {
 
       const filteredData = data.filter(
         (data: any) =>
-          data.question?.toLowerCase().includes(value.toLowerCase().trim()) ||
-          data?.topic?.name?.toLowerCase().includes(value.toLowerCase().trim()) ||
-          data?.topic?.chapter?.name?.toLowerCase().includes(value.toLowerCase().trim()) ||
-          data?.topic?.chapter?.subject?.name?.toLowerCase().includes(value.toLowerCase().trim()) ||
-          data?.topic?.chapter?.subject?.class?.name?.toLowerCase().includes(value.toLowerCase().trim())
+          data.name?.toLowerCase().includes(value.toLowerCase().trim()) ||
+          data?.chapter?.name?.toLowerCase().includes(value.toLowerCase().trim()) ||
+          data?.chapter?.subject?.name?.toLowerCase().includes(value.toLowerCase().trim()) ||
+          data?.subject?.name?.toLowerCase().includes(value.toLowerCase().trim()) ||
+          data?.chapter?.subject?.class?.name?.toLowerCase().includes(value.toLowerCase().trim()) ||
+          data?.subject?.class?.name?.toLowerCase().includes(value.toLowerCase().trim()) ||
+          data.class?.name.toLowerCase().includes(value.toLowerCase().trim())
       );
       setMainViewData(filteredData);
     } else {
@@ -199,9 +183,8 @@ const MainView = ({ fromPage, data, totalPage, totalRow, role }: Props) => {
           color="primary"
           radius="sm"
           startContent={<Plus />}
-          // as={Link}
-          // href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/create`}
-          onPress={onOpen}
+          as={Link}
+          href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/create`}
         >
           Add New {fromPage}
         </Button>
@@ -255,39 +238,6 @@ const MainView = ({ fromPage, data, totalPage, totalRow, role }: Props) => {
       {totalPage > 1 && (
         <Pagination page={currentPage} onChange={setCurrentPage} showControls initialPage={1} total={totalPage} />
       )}
-
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} backdrop="blur">
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">Create a new {fromPage}</ModalHeader>
-              <ModalBody>
-                <p>Choose the type of {fromPage} (Math/Normal) you want to create.</p>
-                <Button
-                  color="primary"
-                  radius="sm"
-                  startContent={<Plus />}
-                  as={Link}
-                  href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/create?type=math`}
-                  onPress={onOpen}
-                >
-                  Add New Math Type {fromPage}
-                </Button>
-                <Button
-                  color="primary"
-                  radius="sm"
-                  startContent={<Plus />}
-                  as={Link}
-                  href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/create`}
-                  onPress={onOpen}
-                >
-                  Add New Normal Type {fromPage}
-                </Button>
-              </ModalBody>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
     </>
   );
 };

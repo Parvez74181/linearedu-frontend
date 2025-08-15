@@ -20,8 +20,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AlertModal } from "@/components/alert-modal";
 import showToast from "@/lib/toast";
-import { deleteAcademicStructure } from "@/actions";
 import { format } from "date-fns";
+import { deleteInstances } from "@/actions";
 
 type Props = {
   fromPage: string;
@@ -83,7 +83,7 @@ const MainView = ({ fromPage, data, totalPage, totalRow, role }: Props) => {
       title: "Confirm Action",
       message: "Are you sure you want to delete this data?",
       onConfirm: async () => {
-        const resDelete = await deleteAcademicStructure(id, fromPage);
+        const resDelete = await deleteInstances(id, fromPage);
 
         if (resDelete.success) {
           showToast("Success", "success", resDelete.message);

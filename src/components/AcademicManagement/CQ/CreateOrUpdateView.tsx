@@ -16,10 +16,10 @@ import {
 import Link from "next/link";
 import { Key, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, RefreshCw, Trash2 } from "lucide-react";
+import { BookOpenText, Image, Notebook, Plus, RefreshCw, Text, Trash2, Video } from "lucide-react";
 import { AlertModal } from "@/components/alert-modal";
-import { addAcademicStructure, deleteAcademicStructure, updatedAcademicStructure } from "@/actions";
-import UploadPhoto from "@/components/UploadPhoto";
+import { addInstances, deleteInstances, updateInstances } from "@/actions";
+
 import { MathfieldElement } from "mathlive";
 import { capitalizeFirstLetter } from "@/lib/utils";
 
@@ -59,8 +59,8 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
     setLoading(true);
     event.preventDefault();
 
-    if (!questionA && !questionB && !questionC && !questionD) {
-      showToast("Error", "danger", "All options are required");
+    if (!question && !questionA && !questionB && !questionC && !questionD) {
+      showToast("Error", "danger", "All questions(A,B,C,D) are required");
       setLoading(false);
       return;
     }
@@ -76,7 +76,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
     };
 
     if (action == "Create") {
-      const resAdd = await addAcademicStructure(JSON.stringify(bodyData), fromPage);
+      const resAdd = await addInstances(JSON.stringify(bodyData), fromPage);
       if (resAdd?.success) {
         showToast("Success", "success", resAdd?.message);
         handleFormAction();
@@ -86,7 +86,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
       }
     }
     if (action == "Update") {
-      const resUpdate = await updatedAcademicStructure(JSON.stringify({ id: data?.id, ...bodyData }), fromPage);
+      const resUpdate = await updateInstances(JSON.stringify({ id: data?.id, ...bodyData }), fromPage);
 
       if (resUpdate?.success) {
         showToast("Success", "success", resUpdate.message);
@@ -132,7 +132,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
       title: "Confirm Action",
       message: "Are you sure you want to delete this data?",
       onConfirm: async () => {
-        const resDelete = await deleteAcademicStructure(data.id, fromPage);
+        const resDelete = await deleteInstances(data.id, fromPage);
 
         if (resDelete.success) {
           showToast("Success", "success", resDelete.message);
@@ -225,6 +225,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               variant="bordered"
               selectedKey={selectedChapter as any}
               onSelectionChange={setSelectedChapter}
+              startContent={<Notebook opacity={0.5} />}
             >
               {(chapters) => (
                 <AutocompleteItem
@@ -248,6 +249,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               selectedKey={selectedTopic as any}
               onSelectionChange={setSelectedTopic}
               isDisabled={!selectedChapter}
+              startContent={<BookOpenText opacity={0.5} />}
             >
               {(topic) => <AutocompleteItem key={topic.id}>{topic.name}</AutocompleteItem>}
             </Autocomplete>
@@ -257,7 +259,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
           {/* question */}
           {searchParams.get("type") === "math" ? (
             <div className="w-full">
-              <label className="pb-1">{`Enter ${fromPage.toLowerCase()} question`}</label>
+              <label className="pb-1">
+                {`Enter ${fromPage.toLowerCase()} question`} <span className="text-sm text-red-500 ms-0.5">*</span>
+              </label>
               {/* @ts-ignore */}
               <math-field
                 style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
@@ -286,7 +290,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             {/* questionA */}
             {searchParams.get("type") === "math" ? (
               <div className="w-full">
-                <label className="pb-1">{`Enter ${fromPage.toLowerCase()} questionA`}</label>
+                <label className="pb-1">
+                  {`Enter ${fromPage.toLowerCase()} question A`} <span className="text-sm text-red-500 ms-0.5">*</span>
+                </label>
                 {/* @ts-ignore */}
                 <math-field
                   style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
@@ -302,12 +308,13 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
                   inputWrapper: "border-default-300",
                   mainWrapper: "w-full",
                 }}
-                label={`Enter ${fromPage.toLowerCase()} questionA`}
+                label={`Enter ${fromPage.toLowerCase()} question A`}
                 radius="sm"
                 size="lg"
                 variant="bordered"
                 isRequired
                 value={questionA || ""}
+                minRows={1}
                 onChange={(e) => setQuestionA(e.target.value)}
               />
             )}
@@ -315,7 +322,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             {/* questionB */}
             {searchParams.get("type") === "math" ? (
               <div className="w-full">
-                <label className="pb-1">{`Enter ${fromPage.toLowerCase()} questionB`}</label>
+                <label className="pb-1">
+                  {`Enter ${fromPage.toLowerCase()} question B`} <span className="text-sm text-red-500 ms-0.5">*</span>
+                </label>
                 {/* @ts-ignore */}
                 <math-field
                   style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
@@ -331,12 +340,13 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
                   inputWrapper: "border-default-300",
                   mainWrapper: "w-full",
                 }}
-                label={`Enter ${fromPage.toLowerCase()} questionB`}
+                label={`Enter ${fromPage.toLowerCase()} question B`}
                 radius="sm"
                 size="lg"
                 variant="bordered"
                 isRequired
                 value={questionB || ""}
+                minRows={1}
                 onChange={(e) => setQuestionB(e.target.value)}
               />
             )}
@@ -346,7 +356,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             {/* questionC */}
             {searchParams.get("type") === "math" ? (
               <div className="w-full">
-                <label className="pb-1">{`Enter ${fromPage.toLowerCase()} questionC`}</label>
+                <label className="pb-1">
+                  {`Enter ${fromPage.toLowerCase()} question C`} <span className="text-sm text-red-500 ms-0.5">*</span>
+                </label>
                 {/* @ts-ignore */}
                 <math-field
                   style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
@@ -362,12 +374,13 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
                   inputWrapper: "border-default-300",
                   mainWrapper: "w-full",
                 }}
-                label={`Enter ${fromPage.toLowerCase()} questionC`}
+                label={`Enter ${fromPage.toLowerCase()} question C`}
                 radius="sm"
                 size="lg"
                 variant="bordered"
                 isRequired
                 value={questionC || ""}
+                minRows={1}
                 onChange={(e) => setQuestionC(e.target.value)}
               />
             )}
@@ -375,7 +388,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             {/* questionD */}
             {searchParams.get("type") === "math" ? (
               <div className="w-full ">
-                <label className="pb-1">{`Enter ${fromPage.toLowerCase()} questionD`}</label>
+                <label className="pb-1">
+                  {`Enter ${fromPage.toLowerCase()} question D`} <span className="text-sm text-red-500 ms-0.5">*</span>
+                </label>
 
                 {/* @ts-ignore */}
                 <math-field
@@ -392,12 +407,13 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
                   inputWrapper: "border-default-300",
                   mainWrapper: "w-full",
                 }}
-                label={`Enter ${fromPage.toLowerCase()} questionD`}
+                label={`Enter ${fromPage.toLowerCase()} question D`}
                 radius="sm"
                 size="lg"
                 variant="bordered"
                 isRequired
                 value={questionD || ""}
+                minRows={1}
                 onChange={(e) => setQuestionD(e.target.value)}
               />
             )}
@@ -417,6 +433,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               variant="bordered"
               value={solution.text}
               onChange={(e) => setSolution({ ...solution, text: e.target.value })}
+              startContent={<Text opacity={0.5} />}
             />
             <Input
               classNames={{
@@ -430,6 +447,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               variant="bordered"
               value={solution.image}
               onChange={(e) => setSolution({ ...solution, image: e.target.value })}
+              startContent={<Image opacity={0.5} />}
             />{" "}
             <Input
               classNames={{
@@ -443,6 +461,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               variant="bordered"
               value={solution.video}
               onChange={(e) => setSolution({ ...solution, video: e.target.value })}
+              startContent={<Video opacity={0.5} />}
             />
           </div>
         </div>

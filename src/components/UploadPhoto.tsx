@@ -107,7 +107,7 @@ const UploadPhoto = ({ setImage, image, title }: Props) => {
             height={500}
             width={500}
             alt="Uploaded Photo"
-            className="object-cover w-full h-full"
+            className="object-contain w-full h-full"
           />
         ) : (
           <div className="flex flex-col items-center justify-center text-gray-400 group-hover:text-indigo-500">

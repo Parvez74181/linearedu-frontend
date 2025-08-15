@@ -18,29 +18,21 @@ import { Key, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, RefreshCw, Trash2 } from "lucide-react";
 import { AlertModal } from "@/components/alert-modal";
-import { addAcademicStructure, deleteAcademicStructure, updatedAcademicStructure } from "@/actions";
+import { addInstances, deleteInstances, updateInstances } from "@/actions";
 import UploadPhoto from "@/components/UploadPhoto";
 
 type Props = {
   fromPage: string;
   action: "Create" | "Update";
   data?: any;
-  classes?: any[];
-  courses?: any[];
-  subjects?: any[];
-  chapters?: any[];
   role?: string;
 };
-const CreateOrUpdateView = ({ fromPage, action, data, classes, courses, subjects, chapters, role }: Props) => {
+const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [actionType, setActionType] = useState<"save" | "save_and_create">("save");
-  const [selectedClass, setSelectedClass] = useState<Key | null>("");
-  const [selectedSubject, setSelectedSubject] = useState<Key | null>("");
-  const [selectedChapter, setSelectedChapter] = useState<Key | null>("");
-  const [selectedCourses, setSelectedCourses] = useState<Selection>(new Set([]));
 
-  const [icon, setIcon] = useState("");
+  const [image, setImage] = useState("");
 
   const alertRef = useRef<any>(null);
   const router = useRouter();
@@ -50,21 +42,21 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, courses, subjects
     event.preventDefault();
     let fileUploadResData;
     const formData = new FormData(event.currentTarget);
-    const name = formData.get("name") as string;
+    const url = formData.get("url") as string;
 
     formData.append("fromPage", fromPage);
 
     // icon upload
-    if (icon) {
-      formData.append("image", icon);
+    if (image) {
+      formData.append("image", image);
 
       if (action === "Update") {
-        if (icon === data?.icon) formData.delete("image");
-        if (icon !== data?.icon) formData.append("prevFile", data.icon);
+        if (image === data?.image) formData.delete("image");
+        if (image !== data?.image) formData.append("prevFile", data.image);
       }
-      const image = formData.get("image") as any;
+      const imageFile = formData.get("image") as any;
 
-      if (image) {
+      if (imageFile) {
         const fileUploadRes = await fetch("/api/upload-file", {
           method: "POST",
           body: formData,
@@ -79,15 +71,12 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, courses, subjects
     }
 
     const bodyData = {
-      name,
-      classId: selectedClass,
-      subjectId: selectedSubject,
-      chapterId: selectedChapter,
-      courses: Array.from(selectedCourses).map((course) => course.toString()),
-      icon: fileUploadResData?.imageUrl,
+      url,
+
+      image: fileUploadResData?.imageUrl,
     };
     if (action == "Create") {
-      const resAdd = await addAcademicStructure(JSON.stringify(bodyData), fromPage);
+      const resAdd = await addInstances(JSON.stringify(bodyData), fromPage);
       if (resAdd?.success) {
         showToast("Success", "success", resAdd?.message);
         handleFormAction();
@@ -97,10 +86,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, courses, subjects
       }
     }
     if (action == "Update") {
-      const resUpdate = await updatedAcademicStructure(
-        JSON.stringify({ id: data?.id || data?.subject?.id, ...bodyData }),
-        fromPage
-      );
+      const resUpdate = await updateInstances(JSON.stringify({ id: data?.id, ...bodyData }), fromPage);
 
       if (resUpdate?.success) {
         showToast("Success", "success", resUpdate.message);
@@ -125,9 +111,6 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, courses, subjects
 
       // reset all states
       setActionType("save");
-      setSelectedClass("");
-      setSelectedSubject("");
-      setSelectedChapter("");
     }
   };
 
@@ -136,7 +119,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, courses, subjects
       title: "Confirm Action",
       message: "Are you sure you want to delete this data?",
       onConfirm: async () => {
-        const resDelete = await deleteAcademicStructure(data.id, fromPage);
+        const resDelete = await deleteInstances(data.id, fromPage);
 
         if (resDelete.success) {
           showToast("Success", "success", resDelete.message);
@@ -154,12 +137,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, courses, subjects
 
   useEffect(() => {
     if (data) {
-      if (data?.icon) setIcon(data?.icon || "");
-
-      setSelectedClass(data?.classId?.toString() || data?.subject?.classId?.toString() || "");
-      setSelectedSubject(data?.subjectId?.toString() || "");
-      setSelectedChapter(data?.chapterId?.toString() || "");
-      setSelectedCourses(new Set(data?.courses?.map((course: any) => course.id.toString()) || []));
+      if (data?.image) setImage(data?.image || "");
     }
   }, [data]);
 
@@ -181,118 +159,27 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, courses, subjects
       </h1>
 
       <Form validationBehavior="native" onSubmit={handleSubmit} className="w-full space-y-5">
-        {!["Topic", "Chapter"].includes(fromPage) && (
-          <UploadPhoto image={icon} setImage={setIcon} title={`Upload ${fromPage} Icon`} />
+        {!["Why Choose Us", "Video Section"].includes(fromPage) && (
+          <UploadPhoto image={image} setImage={setImage} title={`Upload ${fromPage} Image`} />
         )}
 
         <div className="flex items-center gap-5  flex-col w-full">
-          {/* name */}
+          {/* url */}
           <Input
             classNames={{
               inputWrapper: "border-default-300",
               mainWrapper: "w-full",
             }}
-            name="name"
-            label={`Enter ${fromPage.toLowerCase()} name`}
+            name="url"
+            label={`Enter ${fromPage.toLowerCase()} url`}
             radius="sm"
             size="lg"
             required
             labelPlacement="outside"
             variant="bordered"
             isRequired
-            defaultValue={data?.name || data?.subject?.name || ""}
+            defaultValue={data?.url || ""}
           />
-
-          {fromPage === "Subject" && (
-            <div className="flex flex-col lg:flex-row gap-5 w-full">
-              {/* Class */}
-              <Autocomplete
-                classNames={{
-                  base: "*:*:*:border-default-300",
-                }}
-                items={classes}
-                label={`Choose class`}
-                labelPlacement="outside"
-                radius="sm"
-                size="lg"
-                isRequired
-                variant="bordered"
-                selectedKey={selectedClass as any}
-                onSelectionChange={setSelectedClass}
-              >
-                {(classes) => <AutocompleteItem key={classes.id}>{classes.name}</AutocompleteItem>}
-              </Autocomplete>
-
-              <Select
-                classNames={{
-                  base: "*:*:*:border-default-300",
-                }}
-                className="w-full"
-                label="Choose courses"
-                variant="bordered"
-                labelPlacement="outside"
-                radius="sm"
-                size="lg"
-                selectedKeys={selectedCourses}
-                onSelectionChange={setSelectedCourses}
-                selectionMode="multiple"
-              >
-                {courses!.map((course) => (
-                  <SelectItem key={course.id}>{course.name}</SelectItem>
-                ))}
-              </Select>
-            </div>
-          )}
-
-          {fromPage === "Chapter" && (
-            <>
-              {/* subject */}
-              <Autocomplete
-                classNames={{
-                  base: "*:*:*:border-default-300",
-                }}
-                items={subjects}
-                label={`Choose subject`}
-                labelPlacement="outside"
-                radius="sm"
-                size="lg"
-                isRequired
-                variant="bordered"
-                selectedKey={selectedSubject as any}
-                onSelectionChange={setSelectedSubject}
-              >
-                {(subjects) => (
-                  <AutocompleteItem key={subjects.id}>{`${subjects.class.name} -> ${subjects.name}`}</AutocompleteItem>
-                )}
-              </Autocomplete>
-            </>
-          )}
-
-          {fromPage === "Topic" && (
-            <>
-              {/* chapters */}
-              <Autocomplete
-                classNames={{
-                  base: "*:*:*:border-default-300",
-                }}
-                items={chapters}
-                label={`Choose chapter`}
-                labelPlacement="outside"
-                radius="sm"
-                size="lg"
-                isRequired
-                variant="bordered"
-                selectedKey={selectedChapter as any}
-                onSelectionChange={setSelectedChapter}
-              >
-                {(chapters) => (
-                  <AutocompleteItem
-                    key={chapters.id}
-                  >{`${chapters.subject.class.name} -> ${chapters.subject.name} -> ${chapters.name}`}</AutocompleteItem>
-                )}
-              </Autocomplete>
-            </>
-          )}
         </div>
 
         <div className="flex lg:flex-row flex-col lg:items-center gap-5">

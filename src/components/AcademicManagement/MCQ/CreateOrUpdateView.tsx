@@ -16,10 +16,10 @@ import {
 import Link from "next/link";
 import { Key, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Plus, RefreshCw, Trash2 } from "lucide-react";
+import { BookOpenText, Image, Notebook, Plus, RefreshCw, Text, Trash2, Video } from "lucide-react";
 import { AlertModal } from "@/components/alert-modal";
-import { addAcademicStructure, deleteAcademicStructure, updatedAcademicStructure } from "@/actions";
-import UploadPhoto from "@/components/UploadPhoto";
+import { addInstances, deleteInstances, updateInstances } from "@/actions";
+
 import { MathfieldElement } from "mathlive";
 import { capitalizeFirstLetter } from "@/lib/utils";
 
@@ -34,10 +34,10 @@ type Props = {
 };
 
 const correctAnswerOptions = [
-  { key: 1, value: "option1" },
-  { key: 2, value: "option2" },
-  { key: 3, value: "option3" },
-  { key: 4, value: "option4" },
+  { key: 1, value: "Option 1" },
+  { key: 2, value: "Option 2" },
+  { key: 3, value: "Option 3" },
+  { key: 4, value: "Option 4" },
 ];
 const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -84,7 +84,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
     };
 
     if (action == "Create") {
-      const resAdd = await addAcademicStructure(JSON.stringify(bodyData), fromPage);
+      const resAdd = await addInstances(JSON.stringify(bodyData), fromPage);
       if (resAdd?.success) {
         showToast("Success", "success", resAdd?.message);
         handleFormAction();
@@ -94,7 +94,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
       }
     }
     if (action == "Update") {
-      const resUpdate = await updatedAcademicStructure(JSON.stringify({ id: data?.id, ...bodyData }), fromPage);
+      const resUpdate = await updateInstances(JSON.stringify({ id: data?.id, ...bodyData }), fromPage);
 
       if (resUpdate?.success) {
         showToast("Success", "success", resUpdate.message);
@@ -139,7 +139,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
       title: "Confirm Action",
       message: "Are you sure you want to delete this data?",
       onConfirm: async () => {
-        const resDelete = await deleteAcademicStructure(data.id, fromPage);
+        const resDelete = await deleteInstances(data.id, fromPage);
 
         if (resDelete.success) {
           showToast("Success", "success", resDelete.message);
@@ -218,7 +218,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
 
         <div className="flex  gap-5  flex-col w-full">
           <div className="w-full flex flex-col my-5">
-            <h2 className="font-semibold text-2xl text-start opacity-75">Chapter & Topic Selection</h2>
+            <h2 className="font-semibold text-2xl text-start opacity-75 ">Chapter & Topic Selection</h2>
             {/* chapters */}
             <Autocomplete
               classNames={{
@@ -231,8 +231,10 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               size="lg"
               isRequired
               variant="bordered"
+              className="my-5"
               selectedKey={selectedChapter as any}
               onSelectionChange={setSelectedChapter}
+              startContent={<Notebook opacity={0.5} />}
             >
               {(chapters) => (
                 <AutocompleteItem
@@ -256,6 +258,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               selectedKey={selectedTopic as any}
               onSelectionChange={setSelectedTopic}
               isDisabled={!selectedChapter}
+              startContent={<BookOpenText opacity={0.5} />}
             >
               {(topic) => <AutocompleteItem key={topic.id}>{topic.name}</AutocompleteItem>}
             </Autocomplete>
@@ -265,7 +268,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
           {/* question */}
           {searchParams.get("type") === "math" ? (
             <div className="w-full">
-              <label className="pb-1">{`Enter ${fromPage.toLowerCase()} question`}</label>
+              <label className="pb-1">
+                {`Enter ${fromPage.toLowerCase()} question`} <span className="text-sm text-red-500 ms-0.5">*</span>
+              </label>
               {/* @ts-ignore */}
               <math-field
                 style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
@@ -294,7 +299,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             {/* option1 */}
             {searchParams.get("type") === "math" ? (
               <div className="w-full">
-                <label className="pb-1">{`Enter ${fromPage.toLowerCase()} option1`}</label>
+                <label className="pb-1">
+                  {`Enter ${fromPage.toLowerCase()} option 1`} <span className="text-sm text-red-500 ms-0.5">*</span>
+                </label>
                 {/* @ts-ignore */}
                 <math-field
                   style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
@@ -310,7 +317,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
                   inputWrapper: "border-default-300",
                   mainWrapper: "w-full",
                 }}
-                label={`Enter ${fromPage.toLowerCase()} option1`}
+                label={`Enter ${fromPage.toLowerCase()} option 1`}
                 radius="sm"
                 size="lg"
                 labelPlacement="outside"
@@ -324,7 +331,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             {/* option2 */}
             {searchParams.get("type") === "math" ? (
               <div className="w-full">
-                <label className="pb-1">{`Enter ${fromPage.toLowerCase()} option2`}</label>
+                <label className="pb-1">
+                  {`Enter ${fromPage.toLowerCase()} option 2`} <span className="text-sm text-red-500 ms-0.5">*</span>
+                </label>
                 {/* @ts-ignore */}
                 <math-field
                   style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
@@ -340,7 +349,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
                   inputWrapper: "border-default-300",
                   mainWrapper: "w-full",
                 }}
-                label={`Enter ${fromPage.toLowerCase()} option2`}
+                label={`Enter ${fromPage.toLowerCase()} option 2`}
                 radius="sm"
                 size="lg"
                 labelPlacement="outside"
@@ -356,7 +365,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             {/* option3 */}
             {searchParams.get("type") === "math" ? (
               <div className="w-full">
-                <label className="pb-1">{`Enter ${fromPage.toLowerCase()} option3`}</label>
+                <label className="pb-1">
+                  {`Enter ${fromPage.toLowerCase()} option 3`} <span className="text-sm text-red-500 ms-0.5">*</span>
+                </label>
                 {/* @ts-ignore */}
                 <math-field
                   style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
@@ -372,7 +383,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
                   inputWrapper: "border-default-300",
                   mainWrapper: "w-full",
                 }}
-                label={`Enter ${fromPage.toLowerCase()} option3`}
+                label={`Enter ${fromPage.toLowerCase()} option 3`}
                 radius="sm"
                 size="lg"
                 labelPlacement="outside"
@@ -386,7 +397,10 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             {/* option4 */}
             {searchParams.get("type") === "math" ? (
               <div className="w-full ">
-                <label className="pb-1">{`Enter ${fromPage.toLowerCase()} option4`}</label>
+                <label className="pb-1">
+                  {`Enter ${fromPage.toLowerCase()} option 4`}
+                  <span className="text-sm text-red-500 ms-0.5">*</span>
+                </label>
 
                 {/* @ts-ignore */}
                 <math-field
@@ -403,7 +417,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
                   inputWrapper: "border-default-300",
                   mainWrapper: "w-full",
                 }}
-                label={`Enter ${fromPage.toLowerCase()} option4`}
+                label={`Enter ${fromPage.toLowerCase()} option 4`}
                 radius="sm"
                 size="lg"
                 labelPlacement="outside"
@@ -449,6 +463,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               variant="bordered"
               value={solution.text}
               onChange={(e) => setSolution({ ...solution, text: e.target.value })}
+              startContent={<Text opacity={0.5} />}
             />
             <Input
               classNames={{
@@ -462,7 +477,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               variant="bordered"
               value={solution.image}
               onChange={(e) => setSolution({ ...solution, image: e.target.value })}
-            />{" "}
+              startContent={<Image opacity={0.5} />}
+            />
+
             <Input
               classNames={{
                 inputWrapper: "border-default-300",
@@ -475,6 +492,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               variant="bordered"
               value={solution.video}
               onChange={(e) => setSolution({ ...solution, video: e.target.value })}
+              startContent={<Video opacity={0.5} />}
             />
           </div>
         </div>
