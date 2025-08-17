@@ -6,14 +6,13 @@ interface Props {
 const page = async ({ searchParams }: Props) => {
   const { page = "1" } = await searchParams;
   try {
-    const res = await fetch(`${process.env.API_V1}/subject/all?page=${page}`).then((res) => res.json());
+    const res = await fetch(`${process.env.API_V1}/program/all?page=${page}`).then((res) => res.json());
 
-    const totalPage = Math.ceil(res.data.totalRow / res.data.limit);
-
+    const totalPage = Math.ceil(res?.data?.totalRow / res.data.limit);
     return (
       <>
         <MainView
-          fromPage="Subject"
+          fromPage="Program"
           data={res.data.data || []}
           limit={res.data.limit}
           totalPage={totalPage}

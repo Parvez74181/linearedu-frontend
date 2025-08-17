@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@heroui/react": "^2.8.2",
+    "@internationalized/date": "^3.8.2",
+    "@react-aria/i18n": "^3.12.11",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.537.0",

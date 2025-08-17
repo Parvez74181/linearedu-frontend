@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   AcademicManagement,
   Highlights,
+  OlympiadManagement,
   OthersRecords,
   StudentRecords,
   UserManagement,
@@ -47,6 +48,7 @@ const page = async () => {
     <>
       {renderNavGroup("User Management", UserManagement)}
       {renderNavGroup("Highlights", Highlights)}
+      {renderNavGroup("Olympiad", OlympiadManagement)}
       {renderNavGroup("Academic Management", AcademicManagement)}
       {renderNavGroup("Student Record", StudentRecords)}
       {renderNavGroup("Others Record", OthersRecords)}

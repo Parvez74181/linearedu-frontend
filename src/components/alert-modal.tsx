@@ -13,6 +13,7 @@ export const AlertModal = forwardRef((_, ref) => {
   const [config, setConfig] = useState<AlertConfig>({
     title: "",
     message: "",
+
     onConfirm: () => {},
   });
 
@@ -44,10 +45,10 @@ export const AlertModal = forwardRef((_, ref) => {
               <p>{config.message}</p>
             </ModalBody>
             <ModalFooter>
-              <Button color="danger" variant="light" onPress={onClose}>
+              <Button color="danger" radius="sm" variant="light" onPress={onClose}>
                 Cancel
               </Button>
-              <Button color="primary" onPress={handleConfirm}>
+              <Button radius="sm" color="primary" onPress={handleConfirm}>
                 Confirm
               </Button>
             </ModalFooter>

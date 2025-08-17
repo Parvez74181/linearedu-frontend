@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Baloo_Da_2 } from "next/font/google";
+import { Baloo_Da_2, Poppins } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -7,6 +7,11 @@ const baloo_da_2 = Baloo_Da_2({
   variable: "--font-baloo",
   subsets: ["latin"],
   weight: ["400", "500"],
+});
+const poppins = Poppins({
+  variable: "--font-poppins",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -21,7 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning suppressContentEditableWarning>
-      <body className={`${baloo_da_2.variable} ${baloo_da_2.variable} antialiased`}>
+      <body className={`${baloo_da_2.variable}  ${poppins.variable}  ${poppins.className} antialiased`}>
         <Providers> {children}</Providers>
       </body>
     </html>

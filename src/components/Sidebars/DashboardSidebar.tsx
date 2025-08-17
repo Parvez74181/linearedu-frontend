@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import {
   AcademicManagement,
   Highlights,
+  OlympiadManagement,
   OthersRecords,
   StudentRecords,
   UserManagement,
@@ -55,7 +56,7 @@ export const DashboardSidebar = ({ role }: { role: string }) => {
       <>
         {!collapsed && <h2 className="lg:text-lg font-semibold mt-4 mb-1">{title}</h2>}
         {visibleItems.map((nav, i) => {
-          const isActive = pathname?.startsWith(`/dashboard${nav.url.split("?")[0]}`);
+          const isActive = pathname?.endsWith(`/dashboard${nav.url}`);
 
           return (
             <Link
@@ -110,6 +111,7 @@ export const DashboardSidebar = ({ role }: { role: string }) => {
 
           {renderNavGroup("User Management", UserManagement)}
           {renderNavGroup("Highlights", Highlights)}
+          {renderNavGroup("Olympiad", OlympiadManagement)}
           {renderNavGroup("Academic Management", AcademicManagement)}
           {renderNavGroup("Student Record", StudentRecords)}
           {renderNavGroup("Others Record", OthersRecords)}

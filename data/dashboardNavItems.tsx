@@ -39,6 +39,9 @@ import {
   Video,
   ThumbsUp,
   UserStar,
+  Medal,
+  X,
+  AlignStartVertical,
 } from "lucide-react";
 export const UserManagement = [
   { key: "admins", name: "Admin", url: "/admins", icon: <UserRoundCog /> },
@@ -48,13 +51,18 @@ export const UserManagement = [
 ];
 
 export const AcademicManagement = [
-  { key: "class", name: "Classes", url: "/class", icon: <School /> },
+  { key: "class", name: "Class", url: "/class", icon: <School /> },
+  { key: "program", name: "Programs", url: "/program", icon: <BookOpenText /> },
   { key: "subject", name: "Subjects", url: "/subject", icon: <BookOpen /> },
-  { key: "course", name: "Course", url: "/course", icon: <BookOpenText /> },
   { key: "chapter", name: "Chapter", url: "/chapter", icon: <Notebook /> },
   { key: "topic", name: "Topics", url: "/topic", icon: <BookOpenText /> },
   { key: "mcq", name: "MCQs", url: "/mcq", icon: <ListChecks /> },
   { key: "cq", name: "CQs", url: "/cq", icon: <SquareMenu /> },
+];
+
+export const OlympiadManagement = [
+  { key: "olympiad", name: "Olympiad", url: "/olympiad", icon: <Medal /> },
+  { key: "olympiad-stats", name: "Olympiad Stats", url: "/olympiad-stats", icon: <AlignStartVertical /> },
 ];
 
 export const StudentRecords = [

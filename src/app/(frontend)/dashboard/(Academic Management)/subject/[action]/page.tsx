@@ -8,12 +8,12 @@ interface Props {
 const page = async ({ searchParams, params }: Props) => {
   const { action } = await params;
   if (action === "create") {
-    const [classes, courses] = await Promise.all([
+    const [classes, programs] = await Promise.all([
       fetch(`${process.env.API_V1}/class/all`).then((res) => res.json()),
-      fetch(`${process.env.API_V1}/course/all`).then((res) => res.json()),
+      fetch(`${process.env.API_V1}/program/all`).then((res) => res.json()),
     ]);
-    if (!classes || !courses) {
-      return <h2>Classes / Courses not found</h2>;
+    if (!classes || !programs) {
+      return <h2>Classes / Programs not found</h2>;
     }
 
     return (
@@ -23,20 +23,20 @@ const page = async ({ searchParams, params }: Props) => {
           action="Create"
           role={"admin"}
           classes={classes.data.data}
-          courses={courses.data.data}
+          programs={programs.data.data}
         />
       </>
     );
   } else if (action === "update") {
     const { id } = await searchParams;
 
-    const [classes, courses, res] = await Promise.all([
+    const [classes, programs, res] = await Promise.all([
       fetch(`${process.env.API_V1}/class/all`).then((res) => res.json()),
-      fetch(`${process.env.API_V1}/course/all`).then((res) => res.json()),
+      fetch(`${process.env.API_V1}/program/all`).then((res) => res.json()),
       fetch(`${process.env.API_V1}/subject?id=${id}`).then((res) => res.json()),
     ]);
-    if (!classes || !courses) {
-      return <h2>Classes / Courses not found</h2>;
+    if (!classes || !programs) {
+      return <h2>Classes / Programs not found</h2>;
     }
 
     return (
@@ -47,7 +47,7 @@ const page = async ({ searchParams, params }: Props) => {
           role={"admin"}
           data={res.data}
           classes={classes.data.data}
-          courses={courses.data.data}
+          programs={programs.data.data}
         />
       </>
     );

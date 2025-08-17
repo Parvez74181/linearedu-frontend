@@ -7,11 +7,14 @@ import {
   BreadcrumbItem,
   Breadcrumbs,
   Button,
+  Checkbox,
+  DatePicker,
   Form,
   Input,
   Select,
   Selection,
   SelectItem,
+  Textarea,
 } from "@heroui/react";
 import Link from "next/link";
 import { Key, useEffect, useRef, useState } from "react";
@@ -20,27 +23,23 @@ import { Plus, RefreshCw, Trash2 } from "lucide-react";
 import { AlertModal } from "@/components/alert-modal";
 import { addInstances, deleteInstances, updateInstances } from "@/actions";
 import UploadPhoto from "@/components/UploadPhoto";
+import { DateValue, getLocalTimeZone, now, parseDate, today } from "@internationalized/date";
+import { useDateFormatter } from "@react-aria/i18n";
 
 type Props = {
   fromPage: string;
   action: "Create" | "Update";
   data?: any;
-  classes?: any[];
-  programs?: any[];
-  subjects?: any[];
-  chapters?: any[];
   role?: string;
 };
-const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subjects, chapters, role }: Props) => {
+const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
-
   const [actionType, setActionType] = useState<"save" | "save_and_create">("save");
-  const [selectedClass, setSelectedClass] = useState<Key | null>("");
-  const [selectedSubject, setSelectedSubject] = useState<Key | null>("");
-  const [selectedChapter, setSelectedChapter] = useState<Key | null>("");
-  const [selectedPrograms, setSelectedPrograms] = useState<Selection>(new Set([]));
+  const [image, setImage] = useState("");
+  const [startTime, setStartTime] = useState<DateValue | null>(now(getLocalTimeZone()));
+  const [endTime, setEndTime] = useState<DateValue | null>(now(getLocalTimeZone()));
 
-  const [icon, setIcon] = useState("");
+  let formatter = useDateFormatter({ dateStyle: "short", timeStyle: "short" });
 
   const alertRef = useRef<any>(null);
   const router = useRouter();
@@ -50,21 +49,27 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
     event.preventDefault();
     let fileUploadResData;
     const formData = new FormData(event.currentTarget);
-    const name = formData.get("name") as string;
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
 
     formData.append("fromPage", fromPage);
+    if (!image) {
+      setLoading(false);
+      showToast("Error", "danger", "Please choose an image");
+      return;
+    }
 
-    // icon upload
-    if (icon) {
-      formData.append("image", icon);
+    // image upload
+    if (image) {
+      formData.append("image", image);
 
       if (action === "Update") {
-        if (icon === data?.icon) formData.delete("image");
-        if (icon !== data?.icon) formData.append("prevFile", data.icon);
+        if (image === data?.image) formData.delete("image");
+        if (image !== data?.image) formData.append("prevFile", data.image);
       }
-      const image = formData.get("image") as any;
+      const imageFile = formData.get("image") as any;
 
-      if (image) {
+      if (imageFile) {
         const fileUploadRes = await fetch("/api/upload-file", {
           method: "POST",
           body: formData,
@@ -79,13 +84,14 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
     }
 
     const bodyData = {
-      name,
-      classId: selectedClass,
-      subjectId: selectedSubject,
-      chapterId: selectedChapter,
-      programs: Array.from(selectedPrograms).map((course) => course.toString()),
-      icon: fileUploadResData?.imageUrl,
+      title,
+      description,
+      startTime: new Date(startTime!.toDate(getLocalTimeZone())),
+      endTime: new Date(endTime!.toDate(getLocalTimeZone())),
+
+      image: fileUploadResData?.imageUrl,
     };
+
     if (action == "Create") {
       const resAdd = await addInstances(JSON.stringify(bodyData), fromPage);
       if (resAdd?.success) {
@@ -97,10 +103,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
       }
     }
     if (action == "Update") {
-      const resUpdate = await updateInstances(
-        JSON.stringify({ id: data?.id || data?.subject?.id, ...bodyData }),
-        fromPage
-      );
+      const resUpdate = await updateInstances(JSON.stringify({ id: data?.id, ...bodyData }), fromPage);
 
       if (resUpdate?.success) {
         showToast("Success", "success", resUpdate.message);
@@ -125,9 +128,6 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
 
       // reset all states
       setActionType("save");
-      setSelectedClass("");
-      setSelectedSubject("");
-      setSelectedChapter("");
     }
   };
 
@@ -154,12 +154,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
 
   useEffect(() => {
     if (data) {
-      if (data?.icon) setIcon(data?.icon || "");
-
-      setSelectedClass(data?.classId?.toString() || data?.subject?.classId?.toString() || "");
-      setSelectedSubject(data?.subjectId?.toString() || "");
-      setSelectedChapter(data?.chapterId?.toString() || "");
-      setSelectedPrograms(new Set(data?.programs?.map((course: any) => course?.toString()) || []));
+      if (data?.image) setImage(data?.image || "");
     }
   }, [data]);
 
@@ -181,118 +176,76 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
       </h1>
 
       <Form validationBehavior="native" onSubmit={handleSubmit} className="w-full space-y-5">
-        {!["Topic", "Chapter"].includes(fromPage) && (
-          <UploadPhoto image={icon} setImage={setIcon} title={`Upload ${fromPage} Icon`} />
-        )}
+        <UploadPhoto image={image} setImage={setImage} title={`Upload ${fromPage} Image`} />
 
         <div className="flex items-center gap-5  flex-col w-full">
-          {/* name */}
           <Input
             classNames={{
               inputWrapper: "border-default-300",
               mainWrapper: "w-full",
             }}
-            name="name"
-            label={`Enter ${fromPage.toLowerCase()} name`}
+            name="title"
+            label={`Enter ${fromPage.toLowerCase()} title`}
             radius="sm"
             size="lg"
-            required
             labelPlacement="outside"
             variant="bordered"
+            placeholder=" "
             isRequired
-            defaultValue={data?.name || data?.subject?.name || ""}
+            defaultValue={data?.title || ""}
           />
 
-          {fromPage === "Subject" && (
-            <div className="flex flex-col lg:flex-row gap-5 w-full">
-              {/* Class */}
-              <Autocomplete
-                classNames={{
-                  base: "*:*:*:border-default-300",
-                }}
-                items={classes}
-                label={`Choose class`}
-                labelPlacement="outside"
-                radius="sm"
-                size="lg"
-                isRequired
-                variant="bordered"
-                selectedKey={selectedClass as any}
-                onSelectionChange={setSelectedClass}
-              >
-                {(classes) => <AutocompleteItem key={classes.id}>{classes.name}</AutocompleteItem>}
-              </Autocomplete>
+          <div className="flex items-center gap-5 md:flex-row flex-col w-full">
+            <DatePicker
+              classNames={{
+                inputWrapper: "border-default-300",
+              }}
+              hideTimeZone
+              showMonthAndYearPickers
+              minValue={today(getLocalTimeZone())}
+              defaultValue={now(getLocalTimeZone())}
+              label={`Choose ${fromPage.toLowerCase()} start time`}
+              labelPlacement="outside"
+              variant="bordered"
+              radius="sm"
+              size="lg"
+              isRequired
+              value={startTime}
+              onChange={setStartTime}
+            />
+            <DatePicker
+              classNames={{
+                inputWrapper: "border-default-300",
+              }}
+              hideTimeZone
+              showMonthAndYearPickers
+              minValue={today(getLocalTimeZone())}
+              label={`Choose ${fromPage.toLowerCase()} end time`}
+              defaultValue={now(getLocalTimeZone())}
+              labelPlacement="outside"
+              variant="bordered"
+              radius="sm"
+              size="lg"
+              isRequired
+              value={endTime}
+              onChange={setEndTime}
+            />
+          </div>
 
-              <Select
-                classNames={{
-                  base: "*:*:*:border-default-300",
-                }}
-                className="w-full"
-                label="Choose programs"
-                variant="bordered"
-                labelPlacement="outside"
-                radius="sm"
-                size="lg"
-                selectedKeys={selectedPrograms}
-                onSelectionChange={setSelectedPrograms}
-                selectionMode="multiple"
-              >
-                {programs!.map((course) => (
-                  <SelectItem key={course.id}>{course.name}</SelectItem>
-                ))}
-              </Select>
-            </div>
-          )}
-
-          {fromPage === "Chapter" && (
-            <>
-              {/* subject */}
-              <Autocomplete
-                classNames={{
-                  base: "*:*:*:border-default-300",
-                }}
-                items={subjects}
-                label={`Choose subject`}
-                labelPlacement="outside"
-                radius="sm"
-                size="lg"
-                isRequired
-                variant="bordered"
-                selectedKey={selectedSubject as any}
-                onSelectionChange={setSelectedSubject}
-              >
-                {(subjects) => (
-                  <AutocompleteItem key={subjects.id}>{`${subjects.class.name} -> ${subjects.name}`}</AutocompleteItem>
-                )}
-              </Autocomplete>
-            </>
-          )}
-
-          {fromPage === "Topic" && (
-            <>
-              {/* chapters */}
-              <Autocomplete
-                classNames={{
-                  base: "*:*:*:border-default-300",
-                }}
-                items={chapters}
-                label={`Choose chapter`}
-                labelPlacement="outside"
-                radius="sm"
-                size="lg"
-                isRequired
-                variant="bordered"
-                selectedKey={selectedChapter as any}
-                onSelectionChange={setSelectedChapter}
-              >
-                {(chapters) => (
-                  <AutocompleteItem
-                    key={chapters.id}
-                  >{`${chapters.subject.class.name} -> ${chapters.subject.name} -> ${chapters.name}`}</AutocompleteItem>
-                )}
-              </Autocomplete>
-            </>
-          )}
+          <Textarea
+            classNames={{
+              inputWrapper: "border-default-300",
+              mainWrapper: "w-full",
+            }}
+            name="description"
+            labelPlacement="outside"
+            label={`Enter ${fromPage.toLowerCase()} description`}
+            radius="sm"
+            size="lg"
+            variant="bordered"
+            isRequired
+            defaultValue={data?.description || ""}
+          />
         </div>
 
         <div className="flex lg:flex-row flex-col lg:items-center gap-5">

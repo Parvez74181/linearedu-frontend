@@ -220,9 +220,9 @@ export const addInstances = async (data: any, fromPage: string) => {
       },
       body: data,
     });
-
+    const resData = await res.json();
     if (res.ok) return { message: `${fromPage} updated successfully`, success: true };
-    else return { message: "Something went wrong", success: false };
+    else return { message: resData.message, success: false };
   } catch (error) {
     console.log(error);
     return { message: "Something went wrong, please try again", error: JSON.stringify(error), success: false };
@@ -244,9 +244,9 @@ export const updateInstances = async (data: any, fromPage: string) => {
         body: data,
       }
     );
-
+    const resData = await res.json();
     if (res.ok) return { message: `${fromPage} updated successfully`, success: true };
-    else return { message: "Something went wrong", success: false };
+    else return { message: resData.message || "Something went wrong", success: false };
   } catch (error) {
     console.log(error);
     return { message: "Something went wrong, please try again", error: JSON.stringify(error), success: false };
