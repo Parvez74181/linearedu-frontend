@@ -1,7 +1,7 @@
 "use client";
 import { BreadcrumbItem, Breadcrumbs, Button, Input, Pagination, Tooltip } from "@heroui/react";
 import { Table, TableHeader, TableBody, TableColumn, TableRow, TableCell } from "@heroui/table";
-import { Edit, Eye, Plus, SearchIcon, Trash2 } from "lucide-react";
+import { CircleCheck, CircleX, Edit, Eye, Plus, SearchIcon, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -35,31 +35,27 @@ const MainView = ({ fromPage, data, totalPage, totalRow, role }: Props) => {
   const columns = [
     { key: "#", label: "#" },
     { key: "id", label: "ID" },
-    { key: "url", label: `${fromPage.toUpperCase()} URL` },
+
+    { key: "selectedForShowcase", label: "SELECTED FOR SHOWCASE" },
     { key: "createdAt", label: "CREATED AT" },
     { key: "updatedAt", label: "UPDATED AT" },
     { key: "actions", label: "ACTIONS" },
   ];
-
+  if (fromPage === "Banner") {
+    columns.splice(2, 0, { key: "url", label: `${fromPage.toUpperCase()} URL` });
+  } else if (fromPage === "Video Section") {
+    columns.splice(2, 0, { key: "video", label: `VIDEO  URL` });
+    columns.splice(3, 0, { key: "title", label: `VIDEO TITLE` });
+    columns.splice(3, 0, { key: "description", label: `VIDEO DESCRIPTION` });
+  } else if (fromPage === "Why Choose Us") {
+    columns.splice(2, 0, { key: "video", label: `VIDEO  URL` });
+  }
   const [searchQuery, setSearchQuery] = useState("");
   const [mainViewData, setMainViewData] = useState<Data[]>([]);
 
   useEffect(() => {
     if (data) setMainViewData(data);
   }, [data]);
-
-  if (fromPage === "Subject") {
-    columns.splice(2, 0, { key: "classId", label: "CLASS" });
-  }
-  if (fromPage === "Chapter") {
-    columns.splice(2, 0, { key: "classId", label: "CLASS" });
-    columns.splice(3, 0, { key: "subjectId", label: "SUBJECT" });
-  }
-  if (fromPage === "Topic") {
-    columns.splice(2, 0, { key: "classId", label: "CLASS" });
-    columns.splice(3, 0, { key: "subjectId", label: "SUBJECT" });
-    columns.splice(4, 0, { key: "chapterId", label: "CHAPTER" });
-  }
 
   const [currentPage, setCurrentPage] = useState(1);
   const alertRef = useRef<any>(null);
@@ -129,18 +125,13 @@ const MainView = ({ fromPage, data, totalPage, totalRow, role }: Props) => {
             )}
           </TableCell>
         );
-      case "classId":
+      case "selectedForShowcase":
         return (
           <TableCell>
-            {item?.class?.name || item?.subject?.class?.name || item?.chapter?.subject?.class?.name || "-"}
+            {item?.isSelectedForShowcase ? <CircleCheck size={20} color="green" /> : <CircleX size={20} color="red" />}
           </TableCell>
         );
-      case "subjectId":
-        return <TableCell>{item?.subject?.name || item?.chapter?.subject?.name || "-"}</TableCell>;
-      case "chapterId":
-        return <TableCell>{item?.chapter?.name || "-"}</TableCell>;
-      case "groupId":
-        return <TableCell>{item?.group?.name || "-"}</TableCell>;
+
       case "#":
         return <TableCell>{data.indexOf(item) + 1}</TableCell>;
       case "createdAt":

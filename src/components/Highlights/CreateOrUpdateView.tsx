@@ -7,11 +7,13 @@ import {
   BreadcrumbItem,
   Breadcrumbs,
   Button,
+  Checkbox,
   Form,
   Input,
   Select,
   Selection,
   SelectItem,
+  Textarea,
 } from "@heroui/react";
 import Link from "next/link";
 import { Key, useEffect, useRef, useState } from "react";
@@ -29,7 +31,7 @@ type Props = {
 };
 const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
-
+  const [isSelectedForShowcase, setIsSelectedForShowcase] = useState<boolean>(false);
   const [actionType, setActionType] = useState<"save" | "save_and_create">("save");
 
   const [image, setImage] = useState("");
@@ -43,10 +45,13 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
     let fileUploadResData;
     const formData = new FormData(event.currentTarget);
     const url = formData.get("url") as string;
+    const video = formData.get("video") as string;
+    const title = formData.get("title") as string;
+    const description = formData.get("description") as string;
 
     formData.append("fromPage", fromPage);
 
-    // icon upload
+    // image upload
     if (image) {
       formData.append("image", image);
 
@@ -72,7 +77,10 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
 
     const bodyData = {
       url,
-
+      title,
+      video,
+      description,
+      isSelectedForShowcase,
       image: fileUploadResData?.imageUrl,
     };
     if (action == "Create") {
@@ -138,6 +146,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
   useEffect(() => {
     if (data) {
       if (data?.image) setImage(data?.image || "");
+      setIsSelectedForShowcase(data?.isSelectedForShowcase);
     }
   }, [data]);
 
@@ -160,27 +169,85 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
 
       <Form validationBehavior="native" onSubmit={handleSubmit} className="w-full space-y-5">
         {!["Why Choose Us", "Video Section"].includes(fromPage) && (
-          <UploadPhoto image={image} setImage={setImage} title={`Upload ${fromPage} Image`} />
+          <>
+            <UploadPhoto image={image} setImage={setImage} title={`Upload ${fromPage} Image`} />
+            <Input
+              classNames={{
+                inputWrapper: "border-default-300",
+                mainWrapper: "w-full",
+              }}
+              name="url"
+              label={`Enter ${fromPage.toLowerCase()} url`}
+              radius="sm"
+              size="lg"
+              labelPlacement="outside"
+              variant="bordered"
+              isRequired
+              defaultValue={data?.url || ""}
+            />
+          </>
         )}
 
         <div className="flex items-center gap-5  flex-col w-full">
-          {/* url */}
-          <Input
-            classNames={{
-              inputWrapper: "border-default-300",
-              mainWrapper: "w-full",
-            }}
-            name="url"
-            label={`Enter ${fromPage.toLowerCase()} url`}
-            radius="sm"
-            size="lg"
-            required
-            labelPlacement="outside"
-            variant="bordered"
-            isRequired
-            defaultValue={data?.url || ""}
-          />
+          {/* video */}
+          {fromPage !== "Banner" && (
+            <Input
+              classNames={{
+                inputWrapper: "border-default-300",
+                mainWrapper: "w-full",
+              }}
+              name="video"
+              label={`Enter video link`}
+              radius="sm"
+              size="lg"
+              labelPlacement="outside"
+              variant="bordered"
+              isRequired
+              defaultValue={data?.video || ""}
+            />
+          )}
+
+          {fromPage === "Video Section" && (
+            <>
+              {/* title */}
+              <Input
+                classNames={{
+                  inputWrapper: "border-default-300",
+                  mainWrapper: "w-full",
+                }}
+                name="title"
+                label={`Enter title`}
+                radius="sm"
+                size="lg"
+                labelPlacement="outside"
+                variant="bordered"
+                defaultValue={data?.title || ""}
+              />
+              {/* description */}
+              <Textarea
+                classNames={{
+                  inputWrapper: "border-default-300",
+                  mainWrapper: "w-full",
+                }}
+                name="description"
+                label={`Enter description`}
+                radius="sm"
+                size="lg"
+                variant="bordered"
+                defaultValue={data?.description || ""}
+              />
+            </>
+          )}
         </div>
+
+        <Checkbox
+          className="mb-5"
+          color="success"
+          isSelected={isSelectedForShowcase}
+          onValueChange={setIsSelectedForShowcase}
+        >
+          Select for showcase in homepage
+        </Checkbox>
 
         <div className="flex lg:flex-row flex-col lg:items-center gap-5">
           <Button

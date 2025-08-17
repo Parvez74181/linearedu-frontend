@@ -211,10 +211,8 @@ export const updatedAcademicStructure = async (data: any, academicStructure: str
 };
 
 export const addInstances = async (data: any, fromPage: string) => {
-  console.log(data, fromPage);
-
   try {
-    const res = await fetch(`${process.env.API_V1}/${fromPage.toLowerCase()}/create`, {
+    const res = await fetch(`${process.env.API_V1}/${fromPage.toLowerCase().replaceAll(" ", "-")}/create`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -235,14 +233,17 @@ export const updateInstances = async (data: any, fromPage: string) => {
   const parsedData = JSON.parse(data);
 
   try {
-    const res = await fetch(`${process.env.API_V1}/${fromPage.toLowerCase()}/update/${parsedData?.id}`, {
-      method: "PUT",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: data,
-    });
+    const res = await fetch(
+      `${process.env.API_V1}/${fromPage.toLowerCase().replaceAll(" ", "-")}/update/${parsedData?.id}`,
+      {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: data,
+      }
+    );
 
     if (res.ok) return { message: `${fromPage} updated successfully`, success: true };
     else return { message: "Something went wrong", success: false };
@@ -254,7 +255,7 @@ export const updateInstances = async (data: any, fromPage: string) => {
 
 export const deleteInstances = async (id: any, fromPage: string) => {
   try {
-    const res = await fetch(`${process.env.API_V1}/${fromPage?.toLowerCase()}/delete/${id}`, {
+    const res = await fetch(`${process.env.API_V1}/${fromPage?.toLowerCase().replaceAll(" ", "-")}/delete/${id}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -264,70 +265,4 @@ export const deleteInstances = async (id: any, fromPage: string) => {
     console.log(error);
     return { message: "Something went wrong, please try again", error: JSON.stringify(error), success: false };
   }
-
-  // try {
-  //   switch (fromPage) {
-  //     case "Class": {
-  //       const res = await fetch(`${process.env.API_V1}/class/delete/${id}`, {
-  //         method: "DELETE",
-  //         credentials: "include",
-  //       });
-
-  //       if (res.ok) return { message: "Class deleted successfully", success: true };
-  //       else return { message: "Something went wrong", success: false };
-  //     }
-  //     case "Course": {
-  //       const res = await fetch(`${process.env.API_V1}/course/delete/${id}`, {
-  //         method: "DELETE",
-  //         credentials: "include",
-  //       });
-
-  //       if (res.ok) return { message: "Course deleted successfully", success: true };
-  //       else return { message: "Something went wrong", success: false };
-  //     }
-  //     case "Subject": {
-  //       const res = await fetch(`${process.env.API_V1}/subject/delete/${id}`, {
-  //         method: "DELETE",
-  //         credentials: "include",
-  //       });
-
-  //       if (res.ok) return { message: "Subject deleted successfully", success: true };
-  //       else return { message: "Something went wrong", success: false };
-  //     }
-  //     case "Chapter": {
-  //       const res = await fetch(`${process.env.API_V1}/chapter/delete/${id}`, {
-  //         method: "DELETE",
-  //         credentials: "include",
-  //       });
-
-  //       if (res.ok) return { message: "Chapter deleted successfully", success: true };
-  //       else return { message: "Something went wrong", success: false };
-  //     }
-  //     case "MCQ": {
-  //       const res = await fetch(`${process.env.API_V1}/mcq/delete/${id}`, {
-  //         method: "DELETE",
-  //         credentials: "include",
-  //       });
-
-  //       if (res.ok) return { message: "MCQ deleted successfully", success: true };
-  //       else return { message: "Something went wrong", success: false };
-  //     }
-  //     case "CQ": {
-  //       const res = await fetch(`${process.env.API_V1}/cq/delete/${id}`, {
-  //         method: "DELETE",
-  //         credentials: "include",
-  //       });
-
-  //       if (res.ok) return { message: "CQ deleted successfully", success: true };
-  //       else return { message: "Something went wrong", success: false };
-  //     }
-
-  //     default: {
-  //       return { message: "Invalid academic structure", success: false };
-  //     }
-  //   }
-  // } catch (error) {
-  //   console.log(error);
-  //   return { message: "Something went wrong, please try again", error: JSON.stringify(error), success: false };
-  // }
 };

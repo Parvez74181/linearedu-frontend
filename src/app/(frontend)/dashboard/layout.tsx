@@ -10,13 +10,6 @@ export default async function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-
-  const session_token = cookieStore.get("session_token")?.value;
-  if (!session_token) {
-    redirect("/auth/login?as=staff");
-  }
-
   return (
     <>
       {/* {role === "staff" && <AccessControlComponent payload={payload?.user} />} */}

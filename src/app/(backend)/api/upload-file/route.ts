@@ -4,7 +4,6 @@ export async function POST(req: Request) {
   const formData = await req.formData();
   const data: any = Object.fromEntries(formData.entries());
   const prevFile = data.prevFile as string;
-  console.log(data, prevFile);
 
   try {
     if (data?.image) {
