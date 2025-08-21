@@ -6,6 +6,8 @@ const showToast = (title: string, color: colorType = "default", description?: st
     title: title,
     description: description,
     color: color.toLowerCase() as colorType,
+    timeout: 5000,
+    shouldShowTimeoutProgress: true,
     classNames: {
       closeButton: "opacity-100 absolute right-4 top-1/2 -translate-y-1/2",
     },

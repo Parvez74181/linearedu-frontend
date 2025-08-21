@@ -11,6 +11,9 @@ declare global {
       DATA_FETCH_LIMIT: number;
       API_V1: string; // Base URL for API version 1
       NEXT_PUBLIC_API_V1: string; // Base URL for API version 1
+      BETTER_AUTH_SECRET: string;
+      BETTER_AUTH_URL: string;
+      AUTH_API_URL: string;
     }
   }
 }

@@ -32,10 +32,16 @@ type Props = {
   data?: any;
   role?: string;
 };
+
+const olympiadType = [
+  { key: "olympiad", value: "Olympiad" },
+  { key: "medhaBritti", value: "Medha Britti" },
+];
 const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [actionType, setActionType] = useState<"save" | "save_and_create">("save");
   const [image, setImage] = useState("");
+  const [selectedType, setSelectedType] = useState<Key | null>("");
   const [startTime, setStartTime] = useState<DateValue | null>(now(getLocalTimeZone()));
   const [endTime, setEndTime] = useState<DateValue | null>(now(getLocalTimeZone()));
 
@@ -88,7 +94,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
       description,
       startTime: new Date(startTime!.toDate(getLocalTimeZone())),
       endTime: new Date(endTime!.toDate(getLocalTimeZone())),
-
+      olympiadType: selectedType,
       image: fileUploadResData?.imageUrl,
     };
 
@@ -155,6 +161,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
   useEffect(() => {
     if (data) {
       if (data?.image) setImage(data?.image || "");
+      setSelectedType(data?.olympiadType);
     }
   }, [data]);
 
@@ -230,6 +237,23 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
               value={endTime}
               onChange={setEndTime}
             />
+            <Autocomplete
+              classNames={{
+                base: "*:*:*:border-default-300",
+              }}
+              items={olympiadType}
+              label={`Choose olympiad type`}
+              labelPlacement="outside"
+              radius="sm"
+              size="lg"
+              isRequired
+              variant="bordered"
+              selectedKey={selectedType as any}
+              onSelectionChange={setSelectedType}
+              defaultSelectedKey={"olympiad"}
+            >
+              {(type) => <AutocompleteItem key={type.key}>{type.value}</AutocompleteItem>}
+            </Autocomplete>
           </div>
 
           <Textarea

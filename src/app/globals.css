@@ -17,6 +17,8 @@
   --color-dark-3: #424d5b;
   --color-white-1: #f5f3eb;
   --color-white-2: #fff;
+  --color-theme: #f27d38;
+  --color-theme-hover: #bb4d00;
   --breakpoint-xs: 24rem;
 }
 

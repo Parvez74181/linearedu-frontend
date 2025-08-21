@@ -21,6 +21,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: "/api/:path*",
+        destination: `${process.env.AUTH_API_URL}/api/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
