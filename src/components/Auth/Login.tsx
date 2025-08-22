@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Button, Card, CardBody, CardHeader, Checkbox, Input } from "@heroui/react";
-import { signIn } from "@/lib/auth-client";
+import { authClient, signIn } from "@/lib/auth-client";
 
 import showToast from "@/lib/toast";
 
@@ -19,6 +19,7 @@ export default function Login() {
       {
         password,
         phoneNumber,
+        rememberMe,
       },
       {
         onRequest: (res) => {
@@ -37,6 +38,7 @@ export default function Login() {
       }
     );
   };
+
   return (
     <>
       <section className="flex items-center justify-center w-full min-h-screen">
@@ -44,12 +46,18 @@ export default function Login() {
           <CardHeader className="flex-col">
             <h2 className="text-lg md:text-xl">Sign In</h2>
             <div className="text-xs md:text-sm">Enter your email below to login to your account</div>
+            <Link href={"/auth/signup"}>Sign Up</Link>
           </CardHeader>
           <CardBody>
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <label htmlFor="email">ফোন নম্বর</label>
                 <Input
+                  classNames={{
+                    inputWrapper: "border-default-300",
+                    mainWrapper: "w-full",
+                  }}
+                  variant="bordered"
                   id="phone"
                   type="tel"
                   placeholder="০১..."
@@ -65,12 +73,17 @@ export default function Login() {
               <div className="grid gap-2">
                 <div className="flex items-center">
                   <label htmlFor="password">Password</label>
-                  <Link href="#" className="ml-auto inline-block text-sm underline">
+                  <Link href="/auth/forget-password" className="ml-auto inline-block text-sm underline">
                     Forgot your password?
                   </Link>
                 </div>
 
                 <Input
+                  classNames={{
+                    inputWrapper: "border-default-300",
+                    mainWrapper: "w-full",
+                  }}
+                  variant="bordered"
                   id="password"
                   type="password"
                   placeholder="password"

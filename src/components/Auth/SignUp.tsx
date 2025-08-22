@@ -15,9 +15,6 @@ export default function SignUp() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const { data: session } = authClient.useSession();
-
-  console.log(session);
 
   const handleSubmitButtonClick = async () => {
     if (!phoneNumber) {
@@ -26,6 +23,8 @@ export default function SignUp() {
       return;
     }
     const res = await authClient.phoneNumber.sendOtp({ phoneNumber });
+    console.log(res);
+
     if (res.data?.message === "code sent") {
       showToast("Success", "success", "A verification code is sent to your phone number");
     }
@@ -57,6 +56,7 @@ export default function SignUp() {
       phoneNumber,
       code: otp,
     });
+
     console.log(res);
   };
   return (
@@ -64,8 +64,8 @@ export default function SignUp() {
       <section className="flex items-center justify-center w-full min-h-screen">
         <Card className="p-5 bg-dark-1">
           <CardHeader className="flex-col">
-            <h2 className="text-lg md:text-xl">Sign Up</h2>
-            <div className="text-xs md:text-sm">Enter your email below to login to your account</div>
+            <h2 className="text-lg md:text-xl">নিবন্ধন করুন</h2>
+            <div className="text-xs md:text-sm">আপনার অ্যাকাউন্টে লগইন করতে নিচে আপনার ফোন নম্বর লিখুন</div>
           </CardHeader>
           <CardBody>
             <Input

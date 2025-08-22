@@ -12,17 +12,16 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }>) {
   const cookieStore = await cookies();
-  const sessionToken = cookieStore.get("better-auth.session_token");
+  const cookieHeader = cookieStore.toString();
 
-  const res = await fetch(`${process.env.BETTER_AUTH_URL}/api/me?token=${sessionToken?.value}`, {
+  const res = await fetch(`${process.env.BETTER_AUTH_URL}/api/me`, {
     method: "GET",
     credentials: "include", // Ensure cookies are sent with the request
     headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${sessionToken?.value}`,
+      cookie: cookieHeader,
     },
   }).then((res) => res.json());
-  console.log(res);
+  // console.log(res);
 
   return (
     <>
