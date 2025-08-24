@@ -5,8 +5,9 @@ import { Card, CardBody, CardHeader, Input, Button } from "@heroui/react";
 import { ArrowLeft, Lock } from "lucide-react";
 import { useState, useEffect } from "react";
 import OtpInput from "../OTPInput";
-import { authClient } from "@/lib/auth-client";
+
 import { useRouter } from "next/navigation";
+import { formatTime } from "@/lib/utils";
 
 const ForgetPassword = () => {
   const [step, setStep] = useState(1); // 1: Enter phone, 2: Enter OTP, 3: New password
@@ -68,16 +69,6 @@ const ForgetPassword = () => {
   const handleSendOtp = async () => {
     if (validatePhone()) {
       setIsLoading(true);
-      const { data, error } = await authClient.phoneNumber.requestPasswordReset({
-        phoneNumber: phone,
-      });
-
-      if (data?.status) {
-        setStep(2);
-        showToast("Success", "success", "Otp has been sent");
-      } else {
-        showToast("Error", "danger", error?.message);
-      }
     }
     setIsLoading(false);
   };
@@ -98,29 +89,8 @@ const ForgetPassword = () => {
     if (validatePassword()) {
       setIsLoading(true);
 
-      const { data, error } = await authClient.phoneNumber.resetPassword({
-        phoneNumber: phone,
-        otp: otp.join(""),
-        newPassword,
-      });
-      console.log(data, error);
-
-      if (data?.status) {
-        setStep(3);
-        showToast("Success", "success", "Password reset success");
-        router.back();
-      } else {
-        showToast("Error", "danger", error?.message);
-      }
       setIsLoading(false);
     }
-  };
-
-  // Format time from seconds to MM:SS
-  const formatTime = (seconds: any) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
   return (

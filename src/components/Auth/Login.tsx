@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Button, Card, CardBody, CardHeader, Checkbox, Input } from "@heroui/react";
-import { authClient, signIn } from "@/lib/auth-client";
 
 import showToast from "@/lib/toast";
 
@@ -14,30 +13,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmitButtonClick = async () => {
-    await signIn.phoneNumber(
-      {
-        password,
-        phoneNumber,
-        rememberMe,
-      },
-      {
-        onRequest: (res) => {
-          setLoading(true);
-        },
-        onResponse: (res) => {
-          console.log(res);
-
-          setLoading(false);
-          if (res.response.status === 401) {
-            showToast("Error", "danger", res.response.statusText);
-          } else if (res.response.status === 200) {
-            showToast("Success", "success", res.response.statusText);
-          }
-        },
-      }
-    );
-  };
+  const handleSubmitButtonClick = async () => {};
 
   return (
     <>

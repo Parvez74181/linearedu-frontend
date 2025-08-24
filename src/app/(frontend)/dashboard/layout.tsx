@@ -1,7 +1,6 @@
 import AccessControlComponent from "@/components/AccessControlComponent";
 import DashboardNavbar from "@/components/Navbars/DashboardNavbar";
 import DashboardSidebar from "@/components/Sidebars/DashboardSidebar";
-import { authClient } from "@/lib/auth-client";
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -14,13 +13,6 @@ export default async function DashboardLayout({
   const cookieStore = await cookies();
   const cookieHeader = cookieStore.toString();
 
-  const res = await fetch(`${process.env.BETTER_AUTH_URL}/api/me`, {
-    method: "GET",
-    credentials: "include", // Ensure cookies are sent with the request
-    headers: {
-      cookie: cookieHeader,
-    },
-  }).then((res) => res.json());
   // console.log(res);
 
   return (

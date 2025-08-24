@@ -263,3 +263,9 @@ export function getPreviousMonth(currentYearMonth: string): string {
   const prevMonth = String(date.getMonth() + 1).padStart(2, "0");
   return `${prevYear}-${prevMonth}`;
 }
+// Format time from seconds to MM:SS
+export const formatTime = (seconds: any) => {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+};

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Baloo_Da_2, Poppins } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const baloo_da_2 = Baloo_Da_2({
   variable: "--font-baloo",
@@ -27,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning suppressContentEditableWarning>
       <body className={`${baloo_da_2.variable}  ${poppins.variable}  ${poppins.className} antialiased`}>
-        <Providers> {children}</Providers>
+        <Providers>
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </Providers>
       </body>
     </html>
   );
