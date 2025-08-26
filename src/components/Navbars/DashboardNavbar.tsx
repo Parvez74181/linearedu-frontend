@@ -16,15 +16,34 @@ import {
 import DashboardSidebar from "@/components/Sidebars/DashboardSidebar";
 
 import Link from "next/link";
+import showToast from "@/lib/toast";
+import { useRouter } from "next/navigation";
+import { logout } from "@/actions";
 
 const DashboardNavbar = ({ payload }: { payload: any }) => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [user, setUser] = useState<any>("");
 
+  const router = useRouter();
+
   useEffect(() => {
     if (payload) setUser(payload);
   }, [payload]);
 
+  const handleLogout = async () => {
+    try {
+      const res = await logout(user.id);
+      if (res.success) {
+        showToast("Success", "success", res.message);
+        router.replace("/");
+      } else {
+        showToast("Error", "danger", res.message);
+      }
+    } catch (error) {
+      console.log(error);
+      showToast("Error", "danger", "Something went wrong");
+    }
+  };
   return (
     <>
       <nav className="border-gray-600 flex items-center bg-white border-b dark:bg-dark-2 h-[70px] mb-5 w-full">
@@ -70,12 +89,12 @@ const DashboardNavbar = ({ payload }: { payload: any }) => {
                   </div>
                   <div className="flex w-full items-center justify-start gap-8">
                     <span className="w-10">Number</span>
-                    <span>: {user?.phone}</span>
+                    <span>: {user?.phoneNumber}</span>
                   </div>
 
-                  <Link href={"/auth/logout"} className="flex items-center gap-2 mt-5">
+                  <div onClick={handleLogout} className="flex items-center gap-2 mt-5 cursor-pointer">
                     <LogOut /> Logout
-                  </Link>
+                  </div>
                 </div>
               </PopoverContent>
             </Popover>

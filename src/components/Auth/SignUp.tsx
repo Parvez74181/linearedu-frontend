@@ -11,6 +11,8 @@ import Image from "next/image";
 import OtpInput from "../OTPInput";
 import { useQueryState } from "nuqs";
 import { useRouter } from "next/navigation";
+import { useUserStore } from "@/store/userStore";
+import { otpVerify } from "@/actions";
 
 export default function SignUp() {
   const [loading, setLoading] = useState<boolean>(false);
@@ -47,7 +49,7 @@ export default function SignUp() {
     }
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_V1}/user/create`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_V1}/user/create?role=student`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -55,12 +57,19 @@ export default function SignUp() {
         credentials: "include",
         body: JSON.stringify(data),
       }).then((res) => res.json());
-      console.log(res);
 
       if (res.success) {
         showToast("Success", "success", res.message);
         setStep("2");
+
         setPhone(phone as string);
+        setCooldown(120);
+        const interval = setInterval(() => {
+          setCooldown((prev) => {
+            if (prev <= 1) clearInterval(interval);
+            return prev - 1;
+          });
+        }, 1000);
       } else {
         showToast("Error", "danger", res.message);
       }
@@ -73,31 +82,29 @@ export default function SignUp() {
     setLoading(false);
   };
 
-  const handleSendOtp = async () => {
-    setLoading(true);
-
-    setLoading(false);
-  };
   const handleResendOtp = () => {
+    setLoading(true);
     if (cooldown === 0) {
-      handleSendOtp();
+      setCooldown(120);
+      const interval = setInterval(() => {
+        setCooldown((prev) => {
+          if (prev <= 1) clearInterval(interval);
+          return prev - 1;
+        });
+      }, 1000);
     }
+    setLoading(false);
   };
   const handleVerifyOtp = async () => {
     setLoading(true);
     if (otp.join("").length > 0) {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_V1}/user/verify-otp?type=signup`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({ otp: +otp.join("") }),
-      }).then((res) => res.json());
-
+      const res = await otpVerify(JSON.stringify({ otp: otp.join(""), phone }));
       console.log(res);
+
       if (res.success) {
         showToast("Success", "success", res.message);
+        useUserStore.getState().setUser(res.user);
+        setLoading(false);
         router.push("/");
       } else {
         showToast("Error", "danger", res.message);
@@ -113,12 +120,12 @@ export default function SignUp() {
   };
   return (
     <>
-      <section className="flex items-center justify-center w-full min-h-screen py-20 md:p-0 px-5">
+      <section className="flex items-center justify-center w-full min-h-screen my-20 md:p-0 px-2.5">
         {step === "1" && (
           <Form onSubmit={handleSubmit}>
             <Card className="p-5 bg-blend-darken bg-transparent sm:min-w-lg">
               <CardHeader className="flex-col">
-                <h2 className="text-lg md:text-xl">Sign Up</h2>
+                <h2 className="text-lg md:text-xl mb-1">Sign Up</h2>
                 <div className="text-xs md:text-sm text-center">
                   Already have an account?{" "}
                   <Link href={"/auth/login"} className="text-theme underline hover:text-theme/80">
@@ -138,8 +145,24 @@ export default function SignUp() {
                     id="name"
                     name="name"
                     type="text"
-                    placeholder="name..."
+                    placeholder="Enter your name"
                     label="Enter your name"
+                    isRequired
+                    radius="sm"
+                  />{" "}
+                  <Input
+                    classNames={{
+                      inputWrapper: "border-default-300",
+                      mainWrapper: "w-full",
+                    }}
+                    variant="bordered"
+                    labelPlacement="outside"
+                    id="phone"
+                    name="phone"
+                    label="Enter your phone number"
+                    type="tel"
+                    placeholder="01xxxxxxxxx"
+                    startContent={"+88"}
                     isRequired
                     radius="sm"
                   />
@@ -153,37 +176,8 @@ export default function SignUp() {
                     id="email"
                     type="email"
                     name="email"
-                    placeholder="email..."
+                    placeholder="Enter your email"
                     label="Enter your email"
-                    radius="sm"
-                  />
-                  <Input
-                    classNames={{
-                      inputWrapper: "border-default-300",
-                      mainWrapper: "w-full",
-                    }}
-                    variant="bordered"
-                    labelPlacement="outside"
-                    id="phone"
-                    name="phone"
-                    label="Enter your phone number"
-                    type="tel"
-                    placeholder="01..."
-                    isRequired
-                    radius="sm"
-                  />
-                  <Textarea
-                    classNames={{
-                      inputWrapper: "border-default-300",
-                      mainWrapper: "w-full",
-                    }}
-                    variant="bordered"
-                    labelPlacement="outside"
-                    id="address"
-                    name="address"
-                    label="Enter your address"
-                    type="tel"
-                    placeholder=" "
                     radius="sm"
                   />
                   <Input
@@ -235,17 +229,14 @@ export default function SignUp() {
                       )
                     }
                   />
-
                   <Button type="submit" className="w-full bg-theme hover:bg-theme-hover" isLoading={loading}>
                     Sign up
                   </Button>
-
-                  <div className="relative w-full flex items-center justify-center">
+                  <div className="relative w-full flex items-center justify-center my-5">
                     <span className="absolute opacity-80 ">or,</span>
                     <Divider />
                   </div>
-
-                  <div className={cn("w-full gap-2 flex items-center", "justify-between flex-col")}>
+                  <div className={cn("w-full gap-5 flex items-center", "justify-between flex-col")}>
                     <Button className={cn("w-full gap-2")} disabled={loading} onPress={async () => {}}>
                       <Image alt="google" src={"/google.svg"} width={200} height={200} className="size-5" />
                       Sign up with Google

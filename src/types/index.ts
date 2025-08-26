@@ -8,3 +8,19 @@ export interface siteSetting {
   instagram: string;
   whatsapp: string;
 }
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  image: string | null;
+  address: string;
+  phoneNumber: string;
+  phoneNumberVerified: boolean;
+  scope: "credentials" | string;
+  accessToken: string | null;
+  refreshToken: string | null;
+  accessTokenExpiresAt: string | null;
+  refreshTokenExpiresAt: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
+}
