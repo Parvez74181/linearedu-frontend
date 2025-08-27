@@ -16,7 +16,16 @@ import {
 import Link from "next/link";
 import { Key, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { BookOpenText, Image, Notebook, Plus, RefreshCw, Text, Trash2, Video } from "lucide-react";
+import {
+  BookOpenText,
+  Image,
+  Notebook,
+  Plus,
+  RefreshCw,
+  Text,
+  Trash2,
+  Video,
+} from "lucide-react";
 import { AlertModal } from "@/components/alert-modal";
 import { addInstances, deleteInstances, updateInstances } from "@/actions";
 
@@ -39,19 +48,29 @@ const correctAnswerOptions = [
   { key: 3, value: "Option 3" },
   { key: 4, value: "Option 4" },
 ];
-const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) => {
+const CreateOrUpdateView = ({
+  fromPage,
+  action,
+  data,
+  chapters,
+  role,
+}: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [actionType, setActionType] = useState<"save" | "save_and_create">("save");
+  const [actionType, setActionType] = useState<"save" | "save_and_create">(
+    "save"
+  );
   const [topics, setTopics] = useState<any[]>([]);
   const [selectedChapter, setSelectedChapter] = useState<Key | null>("");
   const [selectedTopic, setSelectedTopic] = useState<Key | null>("");
+  const [questionReferences, setQuestionReferences] = useState<string>("");
   const [question, setQuestion] = useState<any>();
   const [option1, setOption1] = useState<any>();
   const [option2, setOption2] = useState<any>();
   const [option3, setOption3] = useState<any>();
   const [option4, setOption4] = useState<any>();
-  const [selectedCorrectAnswer, setSelectedCorrectAnswer] = useState<Key | null>("");
+  const [selectedCorrectAnswer, setSelectedCorrectAnswer] =
+    useState<Key | null>("");
   const [solution, setSolution] = useState({
     text: "",
     image: "",
@@ -81,6 +100,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
       correctAns: selectedCorrectAnswer,
       questionType: searchParams.get("type") || "normal",
       solution,
+      questionReferences,
     };
 
     if (action == "Create") {
@@ -94,7 +114,10 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
       }
     }
     if (action == "Update") {
-      const resUpdate = await updateInstances(JSON.stringify({ id: data?.id, ...bodyData }), fromPage);
+      const resUpdate = await updateInstances(
+        JSON.stringify({ id: data?.id, ...bodyData }),
+        fromPage
+      );
 
       if (resUpdate?.success) {
         showToast("Success", "success", resUpdate.message);
@@ -115,12 +138,15 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
         router.refresh();
       }, 300);
     } else if (actionType === "save_and_create") {
-      router.push(`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/create`);
+      router.push(
+        `/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/create`
+      );
 
       // reset all states
       setActionType("save");
       setSelectedChapter("");
       setSelectedTopic("");
+      setQuestionReferences("");
       setQuestion("");
       setOption1("");
       setOption2("");
@@ -169,6 +195,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
         image: data.solution?.image || "",
         video: data.solution?.video || "",
       });
+      setQuestionReferences(data?.questionReferences);
       setSelectedChapter(data?.topic?.chapter?.id?.toString() || "");
       setSelectedTopic(data?.topic?.id?.toString() || "");
     }
@@ -176,9 +203,12 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
 
   useEffect(() => {
     if (selectedChapter) {
-      fetch(`${process.env.NEXT_PUBLIC_API_V1}/topic/get-by-chapter?chapterId=${selectedChapter}`, {
-        next: { revalidate: 0 },
-      })
+      fetch(
+        `${process.env.NEXT_PUBLIC_API_V1}/topic/get-by-chapter?chapterId=${selectedChapter}`,
+        {
+          next: { revalidate: 0 },
+        }
+      )
         .then((res) => res.json())
         .then((res) => {
           if (res.success) {
@@ -204,21 +234,32 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
           <Link href="/dashboard">Home</Link>
         </BreadcrumbItem>
         <BreadcrumbItem>
-          <Link href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}`}>{fromPage}</Link>
+          <Link
+            href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}`}
+          >
+            {fromPage}
+          </Link>
         </BreadcrumbItem>
         <BreadcrumbItem isCurrent>{action}</BreadcrumbItem>
       </Breadcrumbs>
 
       <h1 className="text-xl md:text-3xl lg:text-5xl my-5">
-        {action} {capitalizeFirstLetter(searchParams.get("type") || "")} {fromPage}
+        {action} {capitalizeFirstLetter(searchParams.get("type") || "")}{" "}
+        {fromPage}
       </h1>
 
-      <Form validationBehavior="native" onSubmit={handleSubmit} className="w-full space-y-5">
+      <Form
+        validationBehavior="native"
+        onSubmit={handleSubmit}
+        className="w-full space-y-5"
+      >
         {/* <UploadPhoto image={icon} setImage={setIcon} title={`Upload ${fromPage} question image`} /> */}
 
         <div className="flex  gap-5  flex-col w-full">
           <div className="w-full flex flex-col my-5">
-            <h2 className="font-semibold text-2xl text-start opacity-75 ">Chapter & Topic Selection</h2>
+            <h2 className="font-semibold text-2xl text-start opacity-75 ">
+              Chapter & Topic Selection
+            </h2>
             {/* chapters */}
             <Autocomplete
               classNames={{
@@ -260,21 +301,47 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               isDisabled={!selectedChapter}
               startContent={<BookOpenText opacity={0.5} />}
             >
-              {(topic) => <AutocompleteItem key={topic.id}>{topic.name}</AutocompleteItem>}
+              {(topic) => (
+                <AutocompleteItem key={topic.id}>{topic.name}</AutocompleteItem>
+              )}
             </Autocomplete>
           </div>
 
-          <h2 className="font-semibold text-2xl text-start opacity-75">Question Writing</h2>
+          <h2 className="font-semibold text-2xl text-start opacity-75">
+            Question Writing
+          </h2>
+
+          <Input
+            classNames={{
+              inputWrapper: "border-default-300",
+              mainWrapper: "w-full",
+            }}
+            label={`Enter ${fromPage.toLowerCase()} question references`}
+            radius="sm"
+            size="lg"
+            labelPlacement="outside"
+            variant="bordered"
+            value={questionReferences}
+            onChange={(e) => setQuestionReferences(e.target.value)}
+          />
+
           {/* question */}
           {searchParams.get("type") === "math" ? (
             <div className="w-full">
               <label className="pb-1">
-                {`Enter ${fromPage.toLowerCase()} question`} <span className="text-sm text-red-500 ms-0.5">*</span>
+                {`Enter ${fromPage.toLowerCase()} question`}{" "}
+                <span className="text-sm text-red-500 ms-0.5">*</span>
               </label>
               {/* @ts-ignore */}
               <math-field
-                style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
-                onInput={(e: any) => setQuestion((e.target as MathfieldElement).value)}
+                style={{
+                  width: "100%",
+                  padding: "5px 10px",
+                  borderRadius: "0.375rem",
+                }}
+                onInput={(e: any) =>
+                  setQuestion((e.target as MathfieldElement).value)
+                }
               >
                 {question}
                 {/* @ts-ignore */}
@@ -300,12 +367,19 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             {searchParams.get("type") === "math" ? (
               <div className="w-full">
                 <label className="pb-1">
-                  {`Enter ${fromPage.toLowerCase()} option 1`} <span className="text-sm text-red-500 ms-0.5">*</span>
+                  {`Enter ${fromPage.toLowerCase()} option 1`}{" "}
+                  <span className="text-sm text-red-500 ms-0.5">*</span>
                 </label>
                 {/* @ts-ignore */}
                 <math-field
-                  style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
-                  onInput={(e: any) => setOption1((e.target as MathfieldElement).value)}
+                  style={{
+                    width: "100%",
+                    padding: "5px 10px",
+                    borderRadius: "0.375rem",
+                  }}
+                  onInput={(e: any) =>
+                    setOption1((e.target as MathfieldElement).value)
+                  }
                 >
                   {option1}
                   {/* @ts-ignore */}
@@ -332,12 +406,19 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             {searchParams.get("type") === "math" ? (
               <div className="w-full">
                 <label className="pb-1">
-                  {`Enter ${fromPage.toLowerCase()} option 2`} <span className="text-sm text-red-500 ms-0.5">*</span>
+                  {`Enter ${fromPage.toLowerCase()} option 2`}{" "}
+                  <span className="text-sm text-red-500 ms-0.5">*</span>
                 </label>
                 {/* @ts-ignore */}
                 <math-field
-                  style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
-                  onInput={(e: any) => setOption2((e.target as MathfieldElement).value)}
+                  style={{
+                    width: "100%",
+                    padding: "5px 10px",
+                    borderRadius: "0.375rem",
+                  }}
+                  onInput={(e: any) =>
+                    setOption2((e.target as MathfieldElement).value)
+                  }
                 >
                   {option2}
                   {/* @ts-ignore */}
@@ -366,12 +447,19 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             {searchParams.get("type") === "math" ? (
               <div className="w-full">
                 <label className="pb-1">
-                  {`Enter ${fromPage.toLowerCase()} option 3`} <span className="text-sm text-red-500 ms-0.5">*</span>
+                  {`Enter ${fromPage.toLowerCase()} option 3`}{" "}
+                  <span className="text-sm text-red-500 ms-0.5">*</span>
                 </label>
                 {/* @ts-ignore */}
                 <math-field
-                  style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
-                  onInput={(e: any) => setOption3((e.target as MathfieldElement).value)}
+                  style={{
+                    width: "100%",
+                    padding: "5px 10px",
+                    borderRadius: "0.375rem",
+                  }}
+                  onInput={(e: any) =>
+                    setOption3((e.target as MathfieldElement).value)
+                  }
                 >
                   {option3}
                   {/* @ts-ignore */}
@@ -404,8 +492,14 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
 
                 {/* @ts-ignore */}
                 <math-field
-                  style={{ width: "100%", padding: "5px 10px", borderRadius: "0.375rem" }}
-                  onInput={(e: any) => setOption4((e.target as MathfieldElement).value)}
+                  style={{
+                    width: "100%",
+                    padding: "5px 10px",
+                    borderRadius: "0.375rem",
+                  }}
+                  onInput={(e: any) =>
+                    setOption4((e.target as MathfieldElement).value)
+                  }
                 >
                   {option4}
                   {/* @ts-ignore */}
@@ -445,13 +539,17 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
             onSelectionChange={setSelectedCorrectAnswer}
           >
             {(correctAnswerOptions) => (
-              <AutocompleteItem key={correctAnswerOptions.key}>{correctAnswerOptions.value}</AutocompleteItem>
+              <AutocompleteItem key={correctAnswerOptions.key}>
+                {correctAnswerOptions.value}
+              </AutocompleteItem>
             )}
           </Autocomplete>
 
           {/* solutions */}
           <div className="flex gap-5 mt-5 flex-col w-full">
-            <h2 className="font-semibold text-2xl text-start opacity-75">Solution Writing</h2>
+            <h2 className="font-semibold text-2xl text-start opacity-75">
+              Solution Writing
+            </h2>
             <Textarea
               classNames={{
                 inputWrapper: "border-default-300",
@@ -462,7 +560,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               size="lg"
               variant="bordered"
               value={solution.text}
-              onChange={(e) => setSolution({ ...solution, text: e.target.value })}
+              onChange={(e) =>
+                setSolution({ ...solution, text: e.target.value })
+              }
               startContent={<Text opacity={0.5} />}
             />
             <Input
@@ -476,7 +576,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               labelPlacement="outside"
               variant="bordered"
               value={solution.image}
-              onChange={(e) => setSolution({ ...solution, image: e.target.value })}
+              onChange={(e) =>
+                setSolution({ ...solution, image: e.target.value })
+              }
               startContent={<Image opacity={0.5} />}
             />
 
@@ -491,7 +593,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               labelPlacement="outside"
               variant="bordered"
               value={solution.video}
-              onChange={(e) => setSolution({ ...solution, video: e.target.value })}
+              onChange={(e) =>
+                setSolution({ ...solution, video: e.target.value })
+              }
               startContent={<Video opacity={0.5} />}
             />
           </div>
@@ -534,7 +638,13 @@ const CreateOrUpdateView = ({ fromPage, action, data, chapters, role }: Props) =
               </Button>
 
               {role === "admin" && (
-                <Button isLoading={loading} onPress={handleDelete} radius="sm" color="danger" startContent={<Trash2 />}>
+                <Button
+                  isLoading={loading}
+                  onPress={handleDelete}
+                  radius="sm"
+                  color="danger"
+                  startContent={<Trash2 />}
+                >
                   Delete {fromPage}
                 </Button>
               )}

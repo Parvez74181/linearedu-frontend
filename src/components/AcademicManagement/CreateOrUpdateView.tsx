@@ -31,14 +31,27 @@ type Props = {
   chapters?: any[];
   role?: string;
 };
-const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subjects, chapters, role }: Props) => {
+const CreateOrUpdateView = ({
+  fromPage,
+  action,
+  data,
+  classes,
+  programs,
+  subjects,
+  chapters,
+  role,
+}: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [actionType, setActionType] = useState<"save" | "save_and_create">("save");
+  const [actionType, setActionType] = useState<"save" | "save_and_create">(
+    "save"
+  );
   const [selectedClass, setSelectedClass] = useState<Key | null>("");
   const [selectedSubject, setSelectedSubject] = useState<Key | null>("");
   const [selectedChapter, setSelectedChapter] = useState<Key | null>("");
-  const [selectedPrograms, setSelectedPrograms] = useState<Selection>(new Set([]));
+  const [selectedPrograms, setSelectedPrograms] = useState<Selection>(
+    new Set([])
+  );
 
   const [icon, setIcon] = useState("");
 
@@ -121,7 +134,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
         router.refresh();
       }, 300);
     } else if (actionType === "save_and_create") {
-      router.push(`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/create`);
+      router.push(
+        `/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}/create`
+      );
 
       // reset all states
       setActionType("save");
@@ -156,10 +171,14 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
     if (data) {
       if (data?.icon) setIcon(data?.icon || "");
 
-      setSelectedClass(data?.classId?.toString() || data?.subject?.classId?.toString() || "");
+      setSelectedClass(
+        data?.classId?.toString() || data?.subject?.classId?.toString() || ""
+      );
       setSelectedSubject(data?.subjectId?.toString() || "");
       setSelectedChapter(data?.chapterId?.toString() || "");
-      setSelectedPrograms(new Set(data?.programs?.map((course: any) => course?.toString()) || []));
+      setSelectedPrograms(
+        new Set(data?.programs?.map((course: any) => course?.toString()) || [])
+      );
     }
   }, [data]);
 
@@ -171,7 +190,11 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
           <Link href="/dashboard">Home</Link>
         </BreadcrumbItem>
         <BreadcrumbItem>
-          <Link href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}`}>{fromPage}</Link>
+          <Link
+            href={`/dashboard/${fromPage.toLowerCase().replaceAll(" ", "-")}`}
+          >
+            {fromPage}
+          </Link>
         </BreadcrumbItem>
         <BreadcrumbItem isCurrent>{action}</BreadcrumbItem>
       </Breadcrumbs>
@@ -180,9 +203,17 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
         {action} {fromPage}
       </h1>
 
-      <Form validationBehavior="native" onSubmit={handleSubmit} className="w-full space-y-5">
+      <Form
+        validationBehavior="native"
+        onSubmit={handleSubmit}
+        className="w-full space-y-5"
+      >
         {!["Topic", "Chapter"].includes(fromPage) && (
-          <UploadPhoto image={icon} setImage={setIcon} title={`Upload ${fromPage} Icon`} />
+          <UploadPhoto
+            image={icon}
+            setImage={setIcon}
+            title={`Upload ${fromPage} Icon`}
+          />
         )}
 
         <div className="flex items-center gap-5  flex-col w-full">
@@ -220,7 +251,11 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
                 selectedKey={selectedClass as any}
                 onSelectionChange={setSelectedClass}
               >
-                {(classes) => <AutocompleteItem key={classes.id}>{classes.name}</AutocompleteItem>}
+                {(classes) => (
+                  <AutocompleteItem key={classes.id}>
+                    {classes.name}
+                  </AutocompleteItem>
+                )}
               </Autocomplete>
 
               <Select
@@ -262,7 +297,9 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
                 onSelectionChange={setSelectedSubject}
               >
                 {(subjects) => (
-                  <AutocompleteItem key={subjects.id}>{`${subjects.class.name} -> ${subjects.name}`}</AutocompleteItem>
+                  <AutocompleteItem
+                    key={subjects.id}
+                  >{`${subjects.class.name} -> ${subjects.name}`}</AutocompleteItem>
                 )}
               </Autocomplete>
             </>
@@ -306,7 +343,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
             {action} {fromPage}
           </Button>
 
-          <Button
+          {/* <Button
             isLoading={loading}
             type="submit"
             radius="sm"
@@ -315,7 +352,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
             onPress={() => setActionType("save_and_create")}
           >
             Save and Create a New {fromPage}
-          </Button>
+          </Button> */}
 
           {action == "Update" && (
             <>
@@ -332,7 +369,13 @@ const CreateOrUpdateView = ({ fromPage, action, data, classes, programs, subject
               </Button>
 
               {role === "admin" && (
-                <Button isLoading={loading} onPress={handleDelete} radius="sm" color="danger" startContent={<Trash2 />}>
+                <Button
+                  isLoading={loading}
+                  onPress={handleDelete}
+                  radius="sm"
+                  color="danger"
+                  startContent={<Trash2 />}
+                >
                   Delete {fromPage}
                 </Button>
               )}

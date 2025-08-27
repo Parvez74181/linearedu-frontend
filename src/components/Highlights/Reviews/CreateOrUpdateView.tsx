@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import { Key, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, RefreshCw, Trash2 } from "lucide-react";
+import { Plus, RefreshCw, Star, Trash2 } from "lucide-react";
 import { AlertModal } from "@/components/alert-modal";
 import { addInstances, deleteInstances, updateInstances } from "@/actions";
 import UploadPhoto from "@/components/UploadPhoto";
@@ -33,6 +33,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isSelectedForShowcase, setIsSelectedForShowcase] =
     useState<boolean>(false);
+  const [isApproved, setIsApproved] = useState<boolean>(false);
   const [actionType, setActionType] = useState<"save" | "save_and_create">(
     "save"
   );
@@ -47,10 +48,6 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
     event.preventDefault();
     let fileUploadResData;
     const formData = new FormData(event.currentTarget);
-    const url = formData.get("url") as string;
-    const video = formData.get("video") as string;
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
 
     formData.append("fromPage", fromPage);
 
@@ -79,13 +76,11 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
     }
 
     const bodyData = {
-      url,
-      title,
-      video,
-      description,
+      isApproved: action === "Create" ? true : isApproved,
       isSelectedForShowcase,
-      image: fileUploadResData?.imageUrl,
+      reviewImage: fileUploadResData?.imageUrl,
     };
+
     if (action == "Create") {
       const resAdd = await addInstances(JSON.stringify(bodyData), fromPage);
       if (resAdd?.success) {
@@ -153,7 +148,7 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
 
   useEffect(() => {
     if (data) {
-      if (data?.image) setImage(data?.image || "");
+      if (data?.reviewImage) setImage(data?.reviewImage || "");
       setIsSelectedForShowcase(data?.isSelectedForShowcase);
     }
   }, [data]);
@@ -184,89 +179,68 @@ const CreateOrUpdateView = ({ fromPage, action, data, role }: Props) => {
         onSubmit={handleSubmit}
         className="w-full space-y-5"
       >
-        {!["Why Choose Us", "Video Section"].includes(fromPage) && (
+        {role !== "student" && (action === "Create" || data?.reviewImage) && (
           <>
             <UploadPhoto
               image={image}
               setImage={setImage}
               title={`Upload ${fromPage} Image`}
             />
+          </>
+        )}
+
+        {/* star */}
+        {action !== "Create" && !data?.reviewImage && (
+          <>
             <Input
               classNames={{
                 inputWrapper: "border-default-300",
                 mainWrapper: "w-full",
               }}
-              name="url"
-              label={`Enter ${fromPage.toLowerCase()} url`}
               radius="sm"
               size="lg"
+              isDisabled
+              startContent={<Star />}
+              label="Star"
+              defaultValue={data?.star}
               labelPlacement="outside"
               variant="bordered"
-              defaultValue={data?.url || ""}
+            />
+            <Textarea
+              classNames={{
+                inputWrapper: "border-default-300",
+                mainWrapper: "w-full",
+              }}
+              radius="sm"
+              size="lg"
+              isDisabled
+              label="Comment"
+              defaultValue={data?.comment}
+              labelPlacement="outside"
+              variant="bordered"
             />
           </>
         )}
 
-        <div className="flex items-center gap-5  flex-col w-full">
-          {/* video */}
-          {fromPage !== "Banner" && (
-            <Input
-              classNames={{
-                inputWrapper: "border-default-300",
-                mainWrapper: "w-full",
-              }}
-              name="video"
-              label={`Enter video link`}
-              radius="sm"
-              size="lg"
-              labelPlacement="outside"
-              variant="bordered"
-              isRequired
-              defaultValue={data?.video || ""}
-            />
-          )}
+        <div className="mb-5 flex items-center gap-10">
+          <Checkbox
+            color="success"
+            isSelected={isSelectedForShowcase}
+            onValueChange={setIsSelectedForShowcase}
+          >
+            Select for showcase in homepage
+          </Checkbox>
 
-          {fromPage === "Video Section" && (
-            <>
-              {/* title */}
-              <Input
-                classNames={{
-                  inputWrapper: "border-default-300",
-                  mainWrapper: "w-full",
-                }}
-                name="title"
-                label={`Enter title`}
-                radius="sm"
-                size="lg"
-                labelPlacement="outside"
-                variant="bordered"
-                defaultValue={data?.title || ""}
-              />
-              {/* description */}
-              <Textarea
-                classNames={{
-                  inputWrapper: "border-default-300",
-                  mainWrapper: "w-full",
-                }}
-                name="description"
-                label={`Enter description`}
-                radius="sm"
-                size="lg"
-                variant="bordered"
-                defaultValue={data?.description || ""}
-              />
-            </>
+          {action !== "Create" && !data?.reviewImage && (
+            <Checkbox
+              color="success"
+              isSelected={isApproved}
+              onValueChange={setIsApproved}
+            >
+              Mark as approved
+            </Checkbox>
           )}
         </div>
-
-        <Checkbox
-          className="mb-5"
-          color="success"
-          isSelected={isSelectedForShowcase}
-          onValueChange={setIsSelectedForShowcase}
-        >
-          Select for showcase in homepage
-        </Checkbox>
 
         <div className="flex lg:flex-row flex-col lg:items-center gap-5">
           <Button

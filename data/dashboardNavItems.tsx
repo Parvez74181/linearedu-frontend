@@ -62,27 +62,67 @@ export const AcademicManagement = [
 
 export const OlympiadManagement = [
   { key: "olympiad", name: "Olympiad", url: "/olympiad", icon: <Medal /> },
-  { key: "olympiad-stats", name: "Olympiad Stats", url: "/olympiad-stats", icon: <AlignStartVertical /> },
+  {
+    key: "olympiad-stats",
+    name: "Olympiad Stats",
+    url: "/olympiad-stats",
+    icon: <AlignStartVertical />,
+  },
 ];
 
 export const StudentRecords = [
   { key: "fines", name: "Fines", url: "/fines", icon: <Hourglass /> },
-  { key: "fine-types", name: "Fine Types", url: "/fine-types", icon: <ListChecks /> },
+  {
+    key: "fine-types",
+    name: "Fine Types",
+    url: "/fine-types",
+    icon: <ListChecks />,
+  },
   { key: "fees", name: "Fees", url: "/fees", icon: <Wallet /> },
-  { key: "exam-results", name: "Exam Results", url: "/exam-results", icon: <BookCheck /> },
-  { key: "exam-summery", name: "Exam Summery", url: "/exam-summery", icon: <BookOpenCheck /> },
+  {
+    key: "exam-results",
+    name: "Exam Results",
+    url: "/exam-results",
+    icon: <BookCheck />,
+  },
+  {
+    key: "exam-summery",
+    name: "Exam Summery",
+    url: "/exam-summery",
+    icon: <BookOpenCheck />,
+  },
 ];
 
 export const Highlights = [
   { key: "banner", name: "Banner", url: "/banner", icon: <Images /> },
-  { key: "video-section", name: "Video Section", url: "/video-section", icon: <Video /> },
-  { key: "why-choose-us", name: "Why Choose Us", url: "/why-choose-us", icon: <ThumbsUp /> },
-  { key: "reviews", name: "Reviews", url: "/reviews", icon: <Star /> },
+  {
+    key: "video-section",
+    name: "Video Section",
+    url: "/video-section",
+    icon: <Video />,
+  },
+  {
+    key: "why-choose-us",
+    name: "Why Choose Us",
+    url: "/why-choose-us",
+    icon: <ThumbsUp />,
+  },
+  { key: "review", name: "Review", url: "/review", icon: <Star /> },
 ];
 
 export const OthersRecords = [
-  { key: "audit-logs", name: "Audit Logs", url: "/audit-logs", icon: <Activity /> },
+  {
+    key: "audit-logs",
+    name: "Audit Logs",
+    url: "/audit-logs",
+    icon: <Activity />,
+  },
   { key: "todos", name: "Todos", url: "/todos", icon: <ListTodo /> },
   { key: "my-todos", name: "My Todos", url: "/my-todos", icon: <ListTodo /> },
-  { key: "site-settings", name: "Site Settings", url: "/site-settings", icon: <Settings /> },
+  {
+    key: "site-settings",
+    name: "Site Settings",
+    url: "/site-settings",
+    icon: <Settings />,
+  },
 ];
