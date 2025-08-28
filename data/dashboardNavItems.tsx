@@ -1,53 +1,35 @@
 import {
-  Menu,
-  GraduationCap,
   UserRoundCog,
   UsersRound,
-  Presentation,
   School,
-  Group,
-  SwatchBook,
-  BanknoteArrowUp,
-  BanknoteArrowDown,
-  HandCoins,
   BookOpen,
   Hourglass,
   ListChecks,
-  BarChart4,
   Wallet,
   BookCheck,
-  Banknote,
-  Megaphone,
   Activity,
   ListTodo,
-  BadgeDollarSign,
-  GalleryHorizontal,
   Images,
   Star,
-  Pen,
-  Pencil,
-  CalendarClock,
   Settings,
-  BookMarked,
   BookOpenCheck,
-  FileText,
   UserPen,
   Notebook,
   BookOpenText,
   SquareMenu,
-  Layers,
   Video,
   ThumbsUp,
   UserStar,
   Medal,
-  X,
-  AlignStartVertical,
+  BookCopy,
+  Eye,
+  ChartSpline,
 } from "lucide-react";
 export const UserManagement = [
-  { key: "admins", name: "Admin", url: "/admins", icon: <UserRoundCog /> },
-  { key: "staffs", name: "Staff", url: "/staffs", icon: <UsersRound /> },
-  { key: "teachers", name: "Teacher", url: "/teachers", icon: <UserPen /> },
-  { key: "students", name: "Student", url: "/students", icon: <UserStar /> },
+  { key: "admin", name: "Admin", url: "/admin", icon: <UserRoundCog /> },
+  { key: "staff", name: "Staff", url: "/staff", icon: <UsersRound /> },
+  { key: "teacher", name: "Teacher", url: "/teacher", icon: <UserPen /> },
+  { key: "student", name: "Student", url: "/student", icon: <UserStar /> },
 ];
 
 export const AcademicManagement = [
@@ -66,7 +48,25 @@ export const OlympiadManagement = [
     key: "olympiad-stats",
     name: "Olympiad Stats",
     url: "/olympiad-stats",
-    icon: <AlignStartVertical />,
+    icon: <ChartSpline />,
+  },
+];
+
+export const CourseManagement = [
+  { key: "course", name: "Course", url: "/course", icon: <BookCopy /> },
+  {
+    key: "course-stats",
+    name: "Course Stats",
+    url: "/course-stats",
+    icon: <ChartSpline />,
+  },
+];
+export const Visitors = [
+  {
+    key: "visitor",
+    name: "Visitor",
+    url: `/visitor?year=${new Date().getFullYear()}`,
+    icon: <Eye />,
   },
 ];
 

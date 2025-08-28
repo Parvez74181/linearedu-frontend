@@ -1,4 +1,3 @@
-import { getSession } from "@/actions";
 import CreateOrUpdateView from "@/components/Highlights/CreateOrUpdateView";
 
 interface Props {
@@ -8,31 +7,19 @@ interface Props {
 
 const page = async ({ searchParams, params }: Props) => {
   const { action } = await params;
-  const session = await getSession();
   if (action === "create") {
     return (
       <>
-        <CreateOrUpdateView
-          fromPage="Banner"
-          action="Create"
-          role={session.user.role}
-        />
+        <CreateOrUpdateView fromPage="Banner" action="Create" role={"admin"} />
       </>
     );
   } else if (action === "update") {
     const { id } = await searchParams;
-    const res = await fetch(`${process.env.API_V1}/banner?id=${id}`).then(
-      (res) => res.json()
-    );
+    const res = await fetch(`${process.env.API_V1}/banner?id=${id}`).then((res) => res.json());
 
     return (
       <>
-        <CreateOrUpdateView
-          fromPage="Banner"
-          action="Update"
-          role={session.user.role}
-          data={res.data}
-        />
+        <CreateOrUpdateView fromPage="Banner" action="Update" role={"admin"} data={res.data} />
       </>
     );
   } else {

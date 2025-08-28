@@ -1,3 +1,4 @@
+import { getSession } from "@/actions";
 import CreateOrUpdateView from "@/components/Olympiad/CreateOrUpdateView";
 
 interface Props {
@@ -7,20 +8,32 @@ interface Props {
 
 const page = async ({ searchParams, params }: Props) => {
   const { action } = await params;
+  const session = await getSession();
   if (action === "create") {
     return (
       <>
-        <CreateOrUpdateView fromPage="Olympiad" action="Create" role={"admin"} />
+        <CreateOrUpdateView
+          fromPage="Olympiad"
+          action="Create"
+          role={session.user.role}
+        />
       </>
     );
   } else if (action === "update") {
     const { id } = await searchParams;
 
-    const res = await fetch(`${process.env.API_V1}/olympiad?id=${id}`).then((res) => res.json());
+    const res = await fetch(`${process.env.API_V1}/olympiad?id=${id}`).then(
+      (res) => res.json()
+    );
 
     return (
       <>
-        <CreateOrUpdateView fromPage="Olympiad" action="Update" role={"admin"} data={res.data} />
+        <CreateOrUpdateView
+          fromPage="Olympiad"
+          action="Update"
+          role={session.user.role}
+          data={res.data}
+        />
       </>
     );
   } else {

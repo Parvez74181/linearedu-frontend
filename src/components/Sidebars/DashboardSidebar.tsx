@@ -6,11 +6,13 @@ import { Menu, LayoutDashboard, ListTodo } from "lucide-react";
 import { usePathname } from "next/navigation";
 import {
   AcademicManagement,
+  CourseManagement,
   Highlights,
   OlympiadManagement,
   OthersRecords,
   StudentRecords,
   UserManagement,
+  Visitors,
 } from "../../../data/dashboardNavItems";
 import { Tooltip } from "@heroui/react";
 
@@ -54,7 +56,9 @@ export const DashboardSidebar = ({ role }: { role: string }) => {
 
     return (
       <>
-        {!collapsed && <h2 className="lg:text-lg font-semibold mt-4 mb-1">{title}</h2>}
+        {!collapsed && (
+          <h2 className="lg:text-lg font-semibold mt-4 mb-1">{title}</h2>
+        )}
         {visibleItems.map((nav, i) => {
           const isActive = pathname?.endsWith(`/dashboard${nav.url}`);
 
@@ -62,9 +66,15 @@ export const DashboardSidebar = ({ role }: { role: string }) => {
             <Link
               href={`/dashboard${nav.url}`}
               key={i}
-              className={`flex items-center ${collapsed ? "justify-center" : "gap-4"} w-full p-2 px-4 rounded-md
+              className={`flex items-center ${
+                collapsed ? "justify-center" : "gap-4"
+              } w-full p-2 px-4 rounded-md
               hover:bg-gray-300 dark:hover:bg-gray-700 lg:text-base text-sm
-              ${isActive ? "bg-gray-600 text-white" : "text-gray-700 dark:text-gray-300"}`}
+              ${
+                isActive
+                  ? "bg-gray-600 text-white"
+                  : "text-gray-700 dark:text-gray-300"
+              }`}
             >
               <Tooltip content={nav.name} placement="right-end">
                 {nav.icon}
@@ -93,15 +103,29 @@ export const DashboardSidebar = ({ role }: { role: string }) => {
         />
 
         {/* Sidebar Content */}
-        <div className={`flex flex-col gap-1 mt-20 px-2 ${collapsed ? "items-center" : "items-start"}`}>
+        <div
+          className={`flex flex-col gap-1 mt-20 px-2 ${
+            collapsed ? "items-center" : "items-start"
+          }`}
+        >
           {/* Title */}
-          {!collapsed && <p className="text-xl lg:text-3xl font-semibold mb-5 text-center w-full">Admin Panel</p>}
+          {!collapsed && (
+            <p className="text-xl lg:text-3xl font-semibold mb-5 text-center w-full">
+              Admin Panel
+            </p>
+          )}
 
           <Link
             href={"/dashboard"}
-            className={`flex items-center ${collapsed ? "justify-center" : "gap-4"} w-full p-2 px-4 rounded-md
+            className={`flex items-center ${
+              collapsed ? "justify-center" : "gap-4"
+            } w-full p-2 px-4 rounded-md
             hover:bg-gray-300 dark:hover:bg-gray-700 
-            ${pathname === `/dashboard` ? "bg-gray-600 text-white" : "text-gray-700 dark:text-gray-300"}`}
+            ${
+              pathname === `/dashboard`
+                ? "bg-gray-600 text-white"
+                : "text-gray-700 dark:text-gray-300"
+            }`}
           >
             <Tooltip content="Dashboard" placement="right-end">
               <LayoutDashboard />
@@ -111,10 +135,12 @@ export const DashboardSidebar = ({ role }: { role: string }) => {
 
           {renderNavGroup("User Management", UserManagement)}
           {renderNavGroup("Highlights", Highlights)}
+          {renderNavGroup("Course Management", CourseManagement)}
           {renderNavGroup("Olympiad", OlympiadManagement)}
           {renderNavGroup("Academic Management", AcademicManagement)}
           {renderNavGroup("Student Record", StudentRecords)}
           {renderNavGroup("Others Record", OthersRecords)}
+          {renderNavGroup("Website Visitors", Visitors)}
         </div>
       </aside>
     </>

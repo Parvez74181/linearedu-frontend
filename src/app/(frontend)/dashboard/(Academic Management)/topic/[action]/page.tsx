@@ -1,3 +1,4 @@
+import { getSession } from "@/actions";
 import CreateOrUpdateView from "@/components/AcademicManagement/CreateOrUpdateView";
 
 interface Props {
@@ -7,15 +8,23 @@ interface Props {
 
 const page = async ({ searchParams, params }: Props) => {
   const { action } = await params;
+  const session = await getSession();
   if (action === "create") {
-    const chapters = await fetch(`${process.env.API_V1}/chapter/all`).then((res) => res.json());
+    const chapters = await fetch(`${process.env.API_V1}/chapter/all`).then(
+      (res) => res.json()
+    );
 
     if (!chapters) {
       return <h2>Chapters not found</h2>;
     }
     return (
       <>
-        <CreateOrUpdateView fromPage="Topic" action="Create" role={"admin"} chapters={chapters.data.data} />
+        <CreateOrUpdateView
+          fromPage="Topic"
+          action="Create"
+          role={session.user.role}
+          chapters={chapters.data.data}
+        />
       </>
     );
   } else if (action === "update") {
@@ -30,7 +39,7 @@ const page = async ({ searchParams, params }: Props) => {
         <CreateOrUpdateView
           fromPage="Topic"
           action="Update"
-          role={"admin"}
+          role={session.user.role}
           data={res.data}
           chapters={chapters.data.data}
         />

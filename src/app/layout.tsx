@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import SaveInfoToStore from "@/components/Auth/SaveInfoToStore";
+import VisitorCounterComponent from "@/components/Visitor/VisitorCounterComponent";
 
 const baloo_da_2 = Baloo_Da_2({
   variable: "--font-baloo",
@@ -28,10 +29,13 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning suppressContentEditableWarning>
-      <body className={`${baloo_da_2.variable}  ${poppins.variable}  ${poppins.className} antialiased`}>
+      <body
+        className={`${baloo_da_2.variable}  ${poppins.variable}  ${poppins.className} antialiased`}
+      >
         <Providers>
           <NuqsAdapter>
             <SaveInfoToStore />
+            <VisitorCounterComponent />
             {children}
           </NuqsAdapter>
         </Providers>

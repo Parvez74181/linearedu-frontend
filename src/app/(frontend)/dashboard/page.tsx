@@ -1,11 +1,13 @@
 import Link from "next/link";
 import {
   AcademicManagement,
+  CourseManagement,
   Highlights,
   OlympiadManagement,
   OthersRecords,
   StudentRecords,
   UserManagement,
+  Visitors,
 } from "../../../../data/dashboardNavItems";
 
 const page = async () => {
@@ -28,7 +30,9 @@ const page = async () => {
 
     return (
       <div className="pb-5 md:pb-10">
-        <h2 className="text-xl md:text-2xl lg:text-4xl font-semibold my-2 md:my-4 lg:my-8">{title}</h2>
+        <h2 className="text-xl md:text-2xl lg:text-4xl font-semibold my-2 md:my-4 lg:my-8">
+          {title}
+        </h2>
         <div className="grid gap-4 lg:gap-10 grid-cols-2 lg:grid-cols-4">
           {filteredItems.map((nav, i) => (
             <Link
@@ -48,10 +52,12 @@ const page = async () => {
     <>
       {renderNavGroup("User Management", UserManagement)}
       {renderNavGroup("Highlights", Highlights)}
+      {renderNavGroup("Course Management", CourseManagement)}
       {renderNavGroup("Olympiad", OlympiadManagement)}
       {renderNavGroup("Academic Management", AcademicManagement)}
       {renderNavGroup("Student Record", StudentRecords)}
       {renderNavGroup("Others Record", OthersRecords)}
+      {renderNavGroup("Website Visitors", Visitors)}
     </>
   );
 };

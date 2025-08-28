@@ -1,3 +1,4 @@
+import { getSession } from "@/actions";
 import CreateOrUpdateView from "@/components/AcademicManagement/CreateOrUpdateView";
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 
 const page = async ({ searchParams, params }: Props) => {
   const { action } = await params;
+  const session = await getSession();
   if (action === "create") {
     const [classes, programs] = await Promise.all([
       fetch(`${process.env.API_V1}/class/all`).then((res) => res.json()),
@@ -21,7 +23,7 @@ const page = async ({ searchParams, params }: Props) => {
         <CreateOrUpdateView
           fromPage="Subject"
           action="Create"
-          role={"admin"}
+          role={session.user.role}
           classes={classes.data.data}
           programs={programs.data.data}
         />
@@ -44,7 +46,7 @@ const page = async ({ searchParams, params }: Props) => {
         <CreateOrUpdateView
           fromPage="Subject"
           action="Update"
-          role={"admin"}
+          role={session.user.role}
           data={res.data}
           classes={classes.data.data}
           programs={programs.data.data}
